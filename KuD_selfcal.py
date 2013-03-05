@@ -149,7 +149,7 @@ for calnum in xrange(5):
                 showgui=INTERACTIVE,
                 iteration='spw,antenna' if INTERACTIVE else '', 
                 figfile='' if INTERACTIVE else 'selfcal%i_spw%i_poldiff.png' % (calnum,spwn),
-                subplot = 221)
+                subplot = 221 if INTERACTIVE else 111)
 
     # The rms noise is about 4 to 8 deg, depending on antenna, but the
     # phase changes are considerably larger.  This indicates that the
