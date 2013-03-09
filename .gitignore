@@ -1,2 +1,7 @@
 *ms
+*.image
+*.flux
+*.residual
+*.model
+*.psf
 
