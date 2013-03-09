@@ -49,9 +49,14 @@
 doplots=True
 INTERACTIVE=False
 
-spw = spwn = 7
+if not 'spwn' in locals():
+    spw = spwn = 6
 field = 'W51 Ku'
-outdir = "spw7_selfcal_iter/"
+outdir = "spw%i_selfcal_iter/" % spwn
+try:
+    os.mkdir(outdir)
+except OSError:
+    pass
 
 # Define the output name for the averaged data:
 avg_data = 'W51Ku_spw%i_AVG.ms' % spwn
@@ -109,6 +114,8 @@ viewer(imagename+".image",
         gui=False)
 exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
+imrms = [imstat(imagename+".image",box='220,120,250,150')['rms']]
+
 #width = 10 # for TW Hydra
 # width = 4 # for NGC 3256
 width = 8 # for W51.  Need to use something divisible.... 128/8 is ok
@@ -130,7 +137,7 @@ for calnum in xrange(10):
     os.system('rm -rf '+caltable)
 
 
-    first_image = 'spw%i_ku_d_firstim_selfcal%i' % (calnum,spwn)
+    first_image = 'spw%i_ku_d_firstim_selfcal%i' % (spwn,calnum)
     os.system("rm -rf "+first_image+".image")
     os.system("rm -rf "+first_image+".model")
     os.system("rm -rf "+first_image+".flux")
@@ -144,7 +151,6 @@ for calnum in xrange(10):
             outformat='png',
             overwrite=True,
             gui=False)
-
 
     # DONE avg/split ing
 
@@ -310,11 +316,17 @@ for calnum in xrange(10):
             weighting='briggs', robust=0.5, niter=5000)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
+    imrms.append(imstat(selfcal_image+".image",box='220,120,250,150')['rms'])
+
     viewer(selfcal_image+".image",
             outfile=outdir+selfcal_image+".image.png",
             outformat='png',
+            overwrite=True,
             gui=False)
 
+    print "FINISHED ITERATION %i" % calnum
+
+print "FINISHED ITERATING!!! YAY!"
 
 # final phase + gain cal:
 # http://casaguides.nrao.edu/index.php?title=Calibrating_a_VLA_5_GHz_continuum_survey#One_Last_Iteration:_Amplitude_.26_Phase_Self_Calibration
@@ -356,3 +368,4 @@ os.system("rm -rf "+selfcal_image+".residual")
 clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency', 
         weighting='briggs', robust=0.5, niter=10000)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+imrms.append(imstat(selfcal_image+".image",box='220,120,250,150')['rms'])
