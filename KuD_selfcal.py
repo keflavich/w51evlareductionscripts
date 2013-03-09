@@ -46,7 +46,7 @@
 # solint='30s'
 # caltable = 'selfcal_twhy_band7.gcal'
 
-spwn = 7
+spw = spwn = 7
 
 # Define the output name for the averaged data:
 avg_data = 'W51Ku_spw%i_AVG.ms' % spwn
@@ -150,6 +150,27 @@ for calnum in xrange(5):
                 iteration='spw,antenna' if INTERACTIVE else '', 
                 figfile='' if INTERACTIVE else 'selfcal%i_spw%i_poldiff.png' % (calnum,spwn),
                 subplot = 221 if INTERACTIVE else 111)
+
+        plotms(vis=avg_data,
+                xaxis='uvdist',
+                yaxis='amp',
+                avgtime='60s',
+                avgchannel='8',
+                coloraxis='corr',
+                title='Iteration %i for spw %i' % (calnum,spw),
+                plotfile='' if INTERACTIVE else 'selfcal%i_spw%i_uvdistamp.png' % (calnum,spwn),
+                )
+
+        plotms(vis=avg_data,
+                xaxis='phase',
+                yaxis='amp',
+                avgtime='60s',
+                avgchannel='8',
+                coloraxis='corr',
+                title='Iteration %i for spw %i' % (calnum,spw),
+                plotfile='' if INTERACTIVE else 'selfcal%i_spw%i_phaseamp.png' % (calnum,spwn),
+                )
+
 
     # The rms noise is about 4 to 8 deg, depending on antenna, but the
     # phase changes are considerably larger.  This indicates that the
