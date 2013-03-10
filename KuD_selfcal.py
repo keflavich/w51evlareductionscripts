@@ -106,7 +106,7 @@ for ant in antnames:
 
 imagename = "noaverage_spw%i" % spwn
 clean(vis=vis, field=field, imagename=imagename, mode='mfs', 
-        weighting='briggs', robust=0.5, niter=5000)
+        weighting='briggs', robust=0.5, niter=5000, imsize=512)
 viewer(imagename+".image",
         outfile=outdir+imagename+".image.png",
         outformat='png',
@@ -143,7 +143,7 @@ for calnum in xrange(10):
     os.system("rm -rf "+first_image+".psf")
     os.system("rm -rf "+first_image+".residual")
     clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
-            weighting='briggs', robust=0.5, niter=500)
+            weighting='briggs', robust=0.5, niter=500, imsize=512)
 
     viewer(first_image+".image",
             outfile=outdir+first_image+".image.png",
@@ -307,7 +307,7 @@ for calnum in xrange(10):
     os.system("rm -rf "+selfcal_image+".psf")
     os.system("rm -rf "+selfcal_image+".residual")
     clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', 
-            weighting='briggs', robust=0.5, niter=5000)
+            weighting='briggs', robust=0.5, niter=5000, imsize=512)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
     imrms.append(imstat(selfcal_image+".image",box='220,120,250,150')['rms'])
@@ -362,3 +362,4 @@ clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency',
         weighting='briggs', robust=0.5, niter=10000)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 imrms.append(imstat(selfcal_image+".image",box='220,120,250,150')['rms'])
+print inrms
