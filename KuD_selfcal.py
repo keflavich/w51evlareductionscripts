@@ -110,7 +110,6 @@ clean(vis=vis, field=field, imagename=imagename, mode='mfs',
 viewer(imagename+".image",
         outfile=outdir+imagename+".image.png",
         outformat='png',
-        overwrite=True,
         gui=False)
 exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
@@ -149,7 +148,6 @@ for calnum in xrange(10):
     viewer(first_image+".image",
             outfile=outdir+first_image+".image.png",
             outformat='png',
-            overwrite=True,
             gui=False)
 
     # DONE avg/split ing
@@ -191,7 +189,6 @@ for calnum in xrange(10):
                 xaxis='time', yaxis='phase',
                 plotrange=[0,0,-180,180],
                 showgui=INTERACTIVE,
-                overwrite=True,
                 figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_phasevstime.png' % (calnum,spwn),
                 iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
@@ -199,7 +196,6 @@ for calnum in xrange(10):
                 xaxis='time', yaxis='amp',
                 plotrange=[0,0,0.5,1.5],
                 showgui=INTERACTIVE,
-                overwrite=True,
                 figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_ampvstime.png' % (calnum,spwn),
                 iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
@@ -207,7 +203,6 @@ for calnum in xrange(10):
                 xaxis='phase', yaxis='amp',
                 plotrange=[-50,50,0.5,1.5],
                 showgui=INTERACTIVE,
-                overwrite=True,
                 figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_ampvsphase.png' % (calnum,spwn),
                 iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
@@ -225,7 +220,6 @@ for calnum in xrange(10):
                 plotrange=[0,0,-25, 25], 
                 poln = '/',
                 showgui=INTERACTIVE,
-                overwrite=True,
                 iteration='spw,antenna' if INTERACTIVE else '', 
                 figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_poldiff.png' % (calnum,spwn),
                 subplot = 221 if INTERACTIVE else 111)
@@ -321,7 +315,6 @@ for calnum in xrange(10):
     viewer(selfcal_image+".image",
             outfile=outdir+selfcal_image+".image.png",
             outformat='png',
-            overwrite=True,
             gui=False)
 
     print "FINISHED ITERATION %i" % calnum
