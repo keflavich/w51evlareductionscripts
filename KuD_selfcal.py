@@ -282,15 +282,18 @@ for calnum in xrange(10):
             plotcal(caltable=caltable,
                     xaxis='time', yaxis='phase',
                     showgui=False,
+                    antenna=ant,
                     figfile=outdir+'selfcal%i_spw%i_phasevstime_ant%s.png' % (calnum,spwn,ant),
                     iteration='')#, subplot = 221)
             plotcal(caltable=caltable, xaxis='amp', yaxis='phase',
                     showgui=False,
+                    antenna=ant,
                     figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
                     iteration='')#, subplot = 221)
             plotms(vis=avg_data, xaxis='phase', yaxis='amp',
                     xdatacolumn='corrected', ydatacolumn='corrected',
                     avgtime='60s', avgchannel='8', coloraxis='corr',
+                    antenna=ant,
                     overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
                     plotfile=outdir+'selfcal%i_spw%i_ant%s_phaseamp.png' % (calnum,spwn,ant),)
 
