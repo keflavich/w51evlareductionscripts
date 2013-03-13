@@ -157,7 +157,7 @@ plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
         overwrite=True,)
 
 plotms(vis=avg_data, spw='0', xaxis='phase', yaxis='amp',
-        avgchannel='128', xdatacolumn='corrected', ydatacolumn='corrected', avgscan=F,
+        avgchannel='128', xdatacolumn='data', ydatacolumn='data', avgscan=F,
         coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
         title='Corrected Phase vs Amp after split',
         plotfile=outdir+'ampvsphase_corrected_avg_spw%i.png' % spwn, field=field,
@@ -198,12 +198,13 @@ viewer(imagename+".image",
         gui=False)
 exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
-plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
-        avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
-        coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
-        title='Model Amp vs Time after shallow clean for spw %i.' % spwn,
-        plotfile=outdir+'ampvstime_model_shallowclean_spw%i.png' % spwn, field=field,
-        overwrite=True,)
+# FAILS!!!!
+#plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
+#        avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
+#        coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+#        title='Model Amp vs Time after shallow clean for spw %i.' % spwn,
+#        plotfile=outdir+'ampvstime_model_shallowclean_spw%i.png' % spwn, field=field,
+#        overwrite=True,)
 
 
 for calnum in xrange(10):
@@ -290,11 +291,15 @@ for calnum in xrange(10):
                     antenna=ant,
                     figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
                     iteration='')#, subplot = 221)
+            if calnum == 0:
+                datacol='data'
+            else:
+                datacol='corrected'
             plotms(vis=avg_data, xaxis='phase', yaxis='amp',
-                    xdatacolumn='corrected', ydatacolumn='corrected',
+                    xdatacolumn=datacol, ydatacolumn=datacol,
                     avgtime='60s', avgchannel='8', coloraxis='corr',
                     antenna=ant,
-                    overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
+                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
                     plotfile=outdir+'selfcal%i_spw%i_ant%s_phaseamp.png' % (calnum,spwn,ant),)
 
         plotcal(caltable=caltable,
