@@ -48,6 +48,7 @@
 
 doplots=True
 INTERACTIVE=False
+reclean=True
 
 if not 'spwn' in locals():
     spw = spwn = 6
@@ -67,15 +68,12 @@ vis = '13A-064.sb18020284.eb19181492.56353.71736577546.ms'
 statsbox='170,50,229,97'
 # old one: '220,120,250,150'
 
+clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
+
 plotants(vis=vis,figfile="plotants.png")
 
 tb.open(vis+"/ANTENNA")
 antnames = tb.getcol("NAME")
-
-# Use the SPLIT task to average the data in velocity.
-
-# ... first removing any previous version
-os.system("rm -rf "+avg_data)
 
 plotms(vis=vis, spw=str(spwn), xaxis='channel', yaxis='amp', avgtime='1e8',
         avgscan=T, coloraxis='corr', iteraxis='', xselfscale=T,
@@ -84,6 +82,9 @@ plotms(vis=vis, spw=str(spwn), xaxis='channel', yaxis='amp', avgtime='1e8',
         field=field,
         overwrite=True,
         )
+
+if not os.path.exists(outdir+'ampvschannel_spw%i.png' % (spwn)):
+    raise IOError("FAILED TO CREATE IMAGE "+outdir+'ampvschannel_spw%i.png' % (spwn))
 
 # plot each antenna's ampl vs time for flagging purposes
 for ant in antnames:
@@ -136,13 +137,20 @@ for ant in antnames:
 # width = 4 # for NGC 3256
 width = 8 # for W51.  Need to use something divisible.... 128/8 is ok
 
-split(vis=vis,
-      outputvis=avg_data,
-      datacolumn='corrected', # was 'data'...
-      #timebin='10s',
-      width=width,
-      field=field,
-      spw=str(spwn))
+if reclean:
+
+    # Use the SPLIT task to average the data in velocity.
+
+    # ... first removing any previous version
+    os.system("rm -rf "+avg_data)
+
+    split(vis=vis,
+          outputvis=avg_data,
+          datacolumn='corrected', # was 'data'...
+          #timebin='10s',
+          width=width,
+          field=field,
+          spw=str(spwn))
 
 # (0) Using your split-off, calibrated data, plot the "model" in this MS using
 # plotms.  It should be unit-valued for all data.  If not, run delmod to get
@@ -165,15 +173,20 @@ plotms(vis=avg_data, spw='0', xaxis='phase', yaxis='amp',
 # (0.5) Run clean non-interactively with some set number of iterations, and be
 # sure to keep the image around for comparison later.  Run delmod to get rid of
 # the model it saved to the MS header.
-imagename="average_spw%i_shallowclean" % spwn
-clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
-        weighting='briggs', robust=0.5, niter=100, imsize=512)
-viewer(imagename+".image",
-        outfile=outdir+imagename+".image.png",
-        outformat='png',
-        gui=False)
-exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
-delmod(avg_data,scr=True)
+if reclean:
+    imagename="average_spw%i_shallowclean" % spwn
+
+    for suffix in clean_output_suffixes:
+        os.system("rm -rf "+imagename+suffix)
+
+    clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
+            weighting='briggs', robust=0.5, niter=100, imsize=512)
+    viewer(imagename+".image",
+            outfile=outdir+imagename+".image.png",
+            outformat='png',
+            gui=False)
+    exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+    delmod(avg_data,scr=True)
 
 
 cleanboxes = [
@@ -187,15 +200,21 @@ cleanboxes = [
 # (1) Clean a single SPW *interactively*, boxing the brightest regions and not
 # cleaning very deeply (maybe 100 iterations).  Keep this model in the header
 # -- it's what you'll use for the first round of self-calibration.
-imagename="average_spw%i_shallowclean_masked" % spwn
-clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
-        weighting='briggs', robust=0.5, niter=100, imsize=512,
-        mask=cleanboxes)
-viewer(imagename+".image",
-        outfile=outdir+imagename+".image.png",
-        outformat='png',
-        gui=False)
-exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+if reclean:
+    imagename="average_spw%i_shallowclean_masked" % spwn
+
+    for suffix in clean_output_suffixes:
+        os.system("rm -rf "+imagename+suffix)
+
+    clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
+            psfmode='hogbom',multiscale=[0,5,10,25],
+            weighting='briggs', robust=0.5, niter=100, imsize=512,
+            mask=cleanboxes)
+    viewer(imagename+".image",
+            outfile=outdir+imagename+".image.png",
+            outformat='png',
+            gui=False)
+    exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
 imrms = [imstat(imagename+".image",box=statsbox)['rms']]
 
@@ -208,50 +227,53 @@ imrms = [imstat(imagename+".image",box=statsbox)['rms']]
 #        overwrite=True,)
 
 
-for calnum in xrange(1):
+for calnum in xrange(4):
 
     # for Ku D W51 Ku spw 2
     refant = 'ea22' # no idea if it even exists
     solint = '30s' # should be more than enough (30s wasn't; lots of missing solutions... hrm)
     caltable = 'selfcal%i_w51ku_spw%i.gcal' % (calnum,spwn)
-    os.system('rm -rf '+caltable)
+    if reclean:
+        os.system('rm -rf '+caltable)
 
+        first_image = 'spw%i_ku_d_firstim_selfcal%i' % (spwn,calnum)
 
-    first_image = 'spw%i_ku_d_firstim_selfcal%i' % (spwn,calnum)
-    os.system("rm -rf "+first_image+".image")
-    os.system("rm -rf "+first_image+".model")
-    os.system("rm -rf "+first_image+".flux")
-    os.system("rm -rf "+first_image+".psf")
-    os.system("rm -rf "+first_image+".residual")
-    clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
-            weighting='briggs', robust=0.5, niter=100, imsize=512,
-            mask=cleanboxes)
+        for suffix in clean_output_suffixes:
+            os.system("rm -rf "+first_image+suffix)
+
+        clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
+                psfmode='hogbom',multiscale=[0,5,10,25],
+                weighting='briggs', robust=0.5, niter=100, imsize=512,
+                mask=cleanboxes)
+        exportfits(imagename=first_image+".image", fitsimage=first_image+".fits", overwrite=True)
 
     viewer(first_image+".image",
             outfile=outdir+first_image+".image.png",
             outformat='png',
             gui=False)
 
-    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
-        avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
-        coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
-        title='Model Amp vs Time after shallow clean for spw %i iter %i.' % (spwn,calnum),
-        plotfile=outdir+'ampvstime_model_shallowclean_spw%i_iter%i.png' % (spwn,calnum), field=field,
-        overwrite=True,)
+    # this fails?
+    #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
+    #    avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
+    #    coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+    #    title='Model Amp vs Time after shallow clean for spw %i iter %i.' % (spwn,calnum),
+    #    plotfile=outdir+'ampvstime_model_shallowclean_spw%i_iter%i.png' % (spwn,calnum), field=field,
+    #    overwrite=True,)
 
     # DONE avg/split ing
 
-    gaincal(vis=avg_data,
-            field='',
-            caltable=caltable,
-            spw='',
-            # gaintype = 'T' could reduce failed fit errors by averaging pols...
-            gaintype='G', #  'G' from http://casaguides.nrao.edu/index.php?title=EVLA_Advanced_Topics_3C391
-            solint=solint,
-            refant=refant,
-            calmode='p',
-            combine='scan',
-            minblperant=4)
+    if reclean:
+        gaincal(vis=avg_data,
+                field='',
+                caltable=caltable,
+                spw='',
+                # gaintype = 'T' could reduce failed fit errors by averaging pols...
+                gaintype='G', #  'G' from http://casaguides.nrao.edu/index.php?title=EVLA_Advanced_Topics_3C391
+                solint=solint,
+                refant=refant,
+                calmode='p',
+                combine='scan',
+                minblperant=4)
 
     #
     # Watch out for failed solutions noted in the terminal during this
@@ -275,45 +297,46 @@ for calnum in xrange(1):
 
     if doplots:
 
-        for ant in antnames:
-            # (4) Have a look at the gain solutions by antenna.  Which antennas
-            # have the largest phase corrections?  Before applying the
-            # calibration, use plotms to display the corrected phase vs. amp
-            # for these antennas, to compare with *after* the correction is
-            # applied.
-            plotcal(caltable=caltable,
-                    xaxis='time', yaxis='phase',
-                    showgui=False,
-                    antenna=ant,
-                    figfile=outdir+'selfcal%i_spw%i_phasevstime_ant%s.png' % (calnum,spwn,ant),
-                    iteration='')#, subplot = 221)
-            #plotcal(caltable=caltable, xaxis='amp', yaxis='phase',
-            #        showgui=False,
-            #        antenna=ant,
-            #        figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
-            #        iteration='')#, subplot = 221)
-            if calnum == 0:
-                datacol='data'
-            else:
-                datacol='corrected'
-            plotms(vis=avg_data, xaxis='time', yaxis='phase',
-                    xdatacolumn=datacol, ydatacolumn=datacol,
-                    avgtime='60s', avgchannel='8', coloraxis='corr',
-                    antenna=ant,
-                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
-                    plotfile=outdir+'selfcal%i_spw%i_ant%s_phasetime.png' % (calnum,spwn,ant),)
-            plotms(vis=avg_data, xaxis='time', yaxis='amp',
-                    xdatacolumn=datacol, ydatacolumn=datacol,
-                    avgtime='60s', avgchannel='8', coloraxis='corr',
-                    antenna=ant,
-                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
-                    plotfile=outdir+'selfcal%i_spw%i_ant%s_amptime.png' % (calnum,spwn,ant),)
-            plotms(vis=avg_data, xaxis='phase', yaxis='amp',
-                    xdatacolumn=datacol, ydatacolumn=datacol,
-                    avgtime='60s', avgchannel='8', coloraxis='corr',
-                    antenna=ant,
-                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
-                    plotfile=outdir+'selfcal%i_spw%i_ant%s_phaseamp.png' % (calnum,spwn,ant),)
+        for ant2 in ['ea16','ea07']:
+            for ant in ['ea14','ea23','ea20','ea18']:
+                # (4) Have a look at the gain solutions by antenna.  Which antennas
+                # have the largest phase corrections?  Before applying the
+                # calibration, use plotms to display the corrected phase vs. amp
+                # for these antennas, to compare with *after* the correction is
+                # applied.
+                plotcal(caltable=caltable,
+                        xaxis='time', yaxis='phase',
+                        showgui=False,
+                        antenna=ant+'&'+ant2,
+                        figfile=outdir+'selfcal%i_spw%i_phasevstime_ant%s-%s.png' % (calnum,spwn,ant,ant2),
+                        iteration='')#, subplot = 221)
+                #plotcal(caltable=caltable, xaxis='amp', yaxis='phase',
+                #        showgui=False,
+                #        antenna=ant,
+                #        figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
+                #        iteration='')#, subplot = 221)
+                if calnum == 0:
+                    datacol='data'
+                else:
+                    datacol='corrected'
+                plotms(vis=avg_data, xaxis='time', yaxis='phase',
+                        xdatacolumn=datacol, ydatacolumn=datacol,
+                        avgtime='15s', avgchannel='8', coloraxis='corr',
+                        antenna=ant+'&'+ant2,
+                        overwrite=True, title='Iteration %i for spw %i and ant %s-%s.  datacol=%s' % (calnum,spwn,ant,ant2,datacol), 
+                        plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_phasetime.png' % (calnum,spwn,ant,ant2),)
+                plotms(vis=avg_data, xaxis='time', yaxis='amp',
+                        xdatacolumn=datacol, ydatacolumn=datacol,
+                        avgtime='15s', avgchannel='8', coloraxis='corr',
+                        antenna=ant+'&'+ant2,
+                        overwrite=True, title='Iteration %i for spw %i and ant %s-%s.  datacol=%s' % (calnum,spwn,ant,ant2,datacol), 
+                        plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_amptime.png' % (calnum,spwn,ant,ant2),)
+                plotms(vis=avg_data, xaxis='phase', yaxis='amp',
+                        xdatacolumn=datacol, ydatacolumn=datacol,
+                        avgtime='60s', avgchannel='8', coloraxis='corr',
+                        antenna=ant+'&'+ant2,
+                        overwrite=True, title='Iteration %i for spw %i and ant %s-%s.  datacol=%s' % (calnum,spwn,ant,ant2,datacol), 
+                        plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_phaseamp.png' % (calnum,spwn,ant,ant2),)
 
         plotcal(caltable=caltable,
                 xaxis='time', yaxis='phase',
@@ -423,38 +446,43 @@ for calnum in xrange(1):
     # 2013-03-04 19:53:37     SEVERE  agentflagger:: (file /opt/casa/stable-2013-02/gcwrap/tools/flagging/agentflagger_cmpt.cc, line 37)      Exception Reported: Invalid Table operation: ArrayColumn::setShape; shape cannot be changed for row 0 column FLAG
     # *** Error *** Invalid Table operation: ArrayColumn::setShape; shape cannot be changed for row 0 column FLAG
 
-    applycal(vis=avg_data,
-             gaintable=caltable,
-             interp='linear',
-             flagbackup=True) # was False when flagmanager was used
+    if reclean:
+        applycal(vis=avg_data,
+                 gaintable=caltable,
+                 interp='linear',
+                 flagbackup=True) # was False when flagmanager was used
 
     # (6) Plot corrected phase vs. amp for the antennas you picked out in (4),
     # to check that in fact the corrections have been applied as expected.
-    for ant in antnames:
-        plotms(vis=avg_data, xaxis='time', yaxis='phase',
-                xdatacolumn='corrected', ydatacolumn='corrected',
-                avgtime='60s', avgchannel='8', coloraxis='corr',
-                overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
-                plotfile=outdir+'selfcal%i_spw%i_ant%s_phasetime_applied.png' % (calnum,spwn,ant),)
-        plotms(vis=avg_data, xaxis='time', yaxis='amp',
-                xdatacolumn='corrected', ydatacolumn='corrected',
-                avgtime='60s', avgchannel='8', coloraxis='corr',
-                overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
-                plotfile=outdir+'selfcal%i_spw%i_ant%s_amptime_applied.png' % (calnum,spwn,ant),)
-        plotms(vis=avg_data, xaxis='phase', yaxis='amp',
-                xdatacolumn='corrected', ydatacolumn='corrected',
-                avgtime='60s', avgchannel='8', coloraxis='corr',
-                overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
-                plotfile=outdir+'selfcal%i_spw%i_ant%s_phaseamp_applied.png' % (calnum,spwn,ant),)
-        plotms(vis=vis, spw='0', xaxis='freq', yaxis='phase', avgtime='1e8',
-                avgscan=T, coloraxis='corr', iteraxis='baseline', xselfscale=T,
-                yselfscale=T,
-                antenna=ant,
-                title='Phase vs Freq with time averaging for spw %i ant %s iter %i' % (spw,ant,calnum),
-                plotfile=outdir+'phasevsfreq_spw%i_ant%s_selfcal%i.png' % (spwn,ant,calnum),
-                field=field,
-                overwrite=True,
-                )
+    for ant2 in ['ea16','ea07']:
+        for ant in ['ea14','ea23','ea20','ea18']:
+            plotms(vis=avg_data, xaxis='time', yaxis='phase',
+                    xdatacolumn='corrected', ydatacolumn='corrected',
+                    avgtime='15s', avgchannel='8', coloraxis='corr',
+                    antenna=ant+'&'+ant2,
+                    overwrite=True, title='Iteration %i for spw %i and ant %s-%s' % (calnum,spw,ant,ant2), 
+                    plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_phasetime_applied.png' % (calnum,spwn,ant,ant2),)
+            plotms(vis=avg_data, xaxis='time', yaxis='amp',
+                    xdatacolumn='corrected', ydatacolumn='corrected',
+                    avgtime='60s', avgchannel='8', coloraxis='corr',
+                    antenna=ant+'&'+ant2,
+                    overwrite=True, title='Iteration %i for spw %i and ant %s-%s' % (calnum,spw,ant,ant2), 
+                    plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_amptime_applied.png' % (calnum,spwn,ant,ant2),)
+            plotms(vis=avg_data, xaxis='phase', yaxis='amp',
+                    xdatacolumn='corrected', ydatacolumn='corrected',
+                    avgtime='60s', avgchannel='8', coloraxis='corr',
+                    antenna=ant+'&'+ant2,
+                    overwrite=True, title='Iteration %i for spw %i and ant %s-%s' % (calnum,spw,ant,ant2), 
+                    plotfile=outdir+'selfcal%i_spw%i_ant%s-%s_phaseamp_applied.png' % (calnum,spwn,ant,ant2),)
+            plotms(vis=vis, spw='0', xaxis='freq', yaxis='phase', avgtime='1e8',
+                    avgscan=T, coloraxis='corr', iteraxis='baseline', xselfscale=T,
+                    yselfscale=T,
+                    antenna=ant+'&'+ant2,
+                    title='Phase vs Freq with time averaging for spw %i ant %s-%s iter %i' % (spw,ant,ant2,calnum),
+                    plotfile=outdir+'phasevsfreq_spw%i_ant%s-%s_selfcal%i.png' % (spwn,ant,ant2,calnum),
+                    field=field,
+                    overwrite=True,
+                    )
     
 
     # Use this command to roll back to the previous flags in the event of
@@ -465,16 +493,15 @@ for calnum in xrange(1):
     #            versionname='before_selfcal_apply')
 
 
-    selfcal_image = 'spw%i_ku_d_selfcal%i' % (spwn,calnum)
-    os.system("rm -rf "+selfcal_image+".image")
-    os.system("rm -rf "+selfcal_image+".model")
-    os.system("rm -rf "+selfcal_image+".flux")
-    os.system("rm -rf "+selfcal_image+".psf")
-    os.system("rm -rf "+selfcal_image+".residual")
-    clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
-            weighting='briggs', robust=0.5, niter=100, imsize=512,
-            mask=cleanboxes)
-    exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+    if reclean:
+        selfcal_image = 'spw%i_ku_d_selfcal%i' % (spwn,calnum)
+        for suffix in clean_output_suffixes:
+            os.system("rm -rf "+selfcal_image+suffix)
+        clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
+                psfmode='hogbom',multiscale=[0,5,10,25],
+                weighting='briggs', robust=0.5, niter=100, imsize=512,
+                mask=cleanboxes)
+        exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
     imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
 
@@ -506,12 +533,17 @@ applycal(vis=avg_data,
          flagbackup=True) # was False when flagmanager was used
 
 selfcal_image = 'spw%i_ku_d_selfcal%i_final' % (spwn,calnum)
-os.system("rm -rf "+selfcal_image+".image")
-os.system("rm -rf "+selfcal_image+".model")
-os.system("rm -rf "+selfcal_image+".flux")
-os.system("rm -rf "+selfcal_image+".psf")
-os.system("rm -rf "+selfcal_image+".residual")
+for suffix in clean_output_suffixes:
+    os.system("rm -rf "+selfcal_image+suffix)
 clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', mask=cleanboxes,
+        weighting='briggs', robust=0.5, niter=10000, imsize=512)
+exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+
+selfcal_image = 'spw%i_ku_d_selfcal%i_final_multiscale' % (spwn,calnum)
+for suffix in clean_output_suffixes:
+    os.system("rm -rf "+selfcal_image+suffix)
+clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', imagermode='csclean',# mask=cleanboxes,
+        multiscale=[0,2,5,10,25], psfmode='hogbom',
         weighting='briggs', robust=0.5, niter=10000, imsize=512)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
@@ -526,12 +558,10 @@ applycal(vis=noavg_data,
          flagbackup=True) # was False when flagmanager was used
 
 selfcal_image = 'spw%i_ku_d_selfcal%i_final_cube' % (spwn,calnum)
-os.system("rm -rf "+selfcal_image+".image")
-os.system("rm -rf "+selfcal_image+".model")
-os.system("rm -rf "+selfcal_image+".flux")
-os.system("rm -rf "+selfcal_image+".psf")
-os.system("rm -rf "+selfcal_image+".residual")
-clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency', mask=cleanboxes,
+for suffix in clean_output_suffixes:
+    os.system("rm -rf "+selfcal_image+suffix)
+clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency',# mask=cleanboxes,
+        multiscale=[0,2,5,10,25], psfmode='hogbom',
         weighting='briggs', robust=0.5, niter=10000, imsize=512)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])

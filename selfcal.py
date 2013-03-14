@@ -486,6 +486,7 @@ def apply_selfcal(rawvis, field, spwn_source, spwn_target):
     aptable = 'selfcal_ap_%s_spw%i.gcal' % (field.replace(" ",""),spwn_source)
     caltable = 'selfcal%i_%s_spw%i.gcal' % (calnum,field.replace(" ",""),spwn_source)
 
+    os.system('rm -rf '+noavg_data)
     split(vis=vis,
           outputvis=noavg_data,
           datacolumn='corrected', # was 'data'...
