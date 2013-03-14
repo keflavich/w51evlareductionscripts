@@ -117,21 +117,20 @@ for ant in antnames:
             overwrite=True,
             )
 
-imagename = "noaverage_spw%i" % spwn
-os.system("rm -rf "+imagename+".image")
-os.system("rm -rf "+imagename+".model")
-os.system("rm -rf "+imagename+".flux")
-os.system("rm -rf "+imagename+".psf")
-os.system("rm -rf "+imagename+".residual")
-clean(vis=vis, field=field, imagename=imagename, mode='mfs', 
-        weighting='briggs', robust=0.5, niter=500, imsize=512)
-viewer(imagename+".image",
-        outfile=outdir+imagename+".image.png",
-        outformat='png',
-        gui=False)
-exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+# imagename = "noaverage_spw%i" % spwn
+# os.system("rm -rf "+imagename+".image")
+# os.system("rm -rf "+imagename+".model")
+# os.system("rm -rf "+imagename+".flux")
+# os.system("rm -rf "+imagename+".psf")
+# os.system("rm -rf "+imagename+".residual")
+# clean(vis=vis, field=field, imagename=imagename, mode='mfs', 
+#         weighting='briggs', robust=0.5, niter=500, imsize=512)
+# viewer(imagename+".image",
+#         outfile=outdir+imagename+".image.png",
+#         outformat='png',
+#         gui=False)
+# exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
-imrms = [imstat(imagename+".image",box=statsbox)['rms']]
 
 #width = 10 # for TW Hydra
 # width = 4 # for NGC 3256
@@ -198,6 +197,8 @@ viewer(imagename+".image",
         gui=False)
 exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
+imrms = [imstat(imagename+".image",box=statsbox)['rms']]
+
 # FAILS!!!!
 #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
 #        avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
@@ -207,7 +208,7 @@ exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=
 #        overwrite=True,)
 
 
-for calnum in xrange(10):
+for calnum in xrange(1):
 
     # for Ku D W51 Ku spw 2
     refant = 'ea22' # no idea if it even exists
@@ -286,15 +287,27 @@ for calnum in xrange(10):
                     antenna=ant,
                     figfile=outdir+'selfcal%i_spw%i_phasevstime_ant%s.png' % (calnum,spwn,ant),
                     iteration='')#, subplot = 221)
-            plotcal(caltable=caltable, xaxis='amp', yaxis='phase',
-                    showgui=False,
-                    antenna=ant,
-                    figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
-                    iteration='')#, subplot = 221)
+            #plotcal(caltable=caltable, xaxis='amp', yaxis='phase',
+            #        showgui=False,
+            #        antenna=ant,
+            #        figfile=outdir+'selfcal%i_spw%i_phasevsamp_ant%s.png' % (calnum,spwn,ant),
+            #        iteration='')#, subplot = 221)
             if calnum == 0:
                 datacol='data'
             else:
                 datacol='corrected'
+            plotms(vis=avg_data, xaxis='time', yaxis='phase',
+                    xdatacolumn=datacol, ydatacolumn=datacol,
+                    avgtime='60s', avgchannel='8', coloraxis='corr',
+                    antenna=ant,
+                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
+                    plotfile=outdir+'selfcal%i_spw%i_ant%s_phasetime.png' % (calnum,spwn,ant),)
+            plotms(vis=avg_data, xaxis='time', yaxis='amp',
+                    xdatacolumn=datacol, ydatacolumn=datacol,
+                    avgtime='60s', avgchannel='8', coloraxis='corr',
+                    antenna=ant,
+                    overwrite=True, title='Iteration %i for spw %i and ant %s.  datacol=%s' % (calnum,spw,ant,datacol), 
+                    plotfile=outdir+'selfcal%i_spw%i_ant%s_amptime.png' % (calnum,spwn,ant),)
             plotms(vis=avg_data, xaxis='phase', yaxis='amp',
                     xdatacolumn=datacol, ydatacolumn=datacol,
                     avgtime='60s', avgchannel='8', coloraxis='corr',
@@ -310,18 +323,24 @@ for calnum in xrange(10):
                 iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
         plotcal(caltable=caltable,
+                xaxis='antenna', yaxis='phase',
+                showgui=INTERACTIVE,
+                figfile=outdir+'selfcal%i_spw%i_phasevsantenna.png' % (calnum,spwn),
+                iteration='')
+
+        plotcal(caltable=caltable,
                 xaxis='time', yaxis='amp',
                 plotrange=[0,0,0.5,1.5],
                 showgui=INTERACTIVE,
                 figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_ampvstime.png' % (calnum,spwn),
                 iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
-        plotcal(caltable=caltable,
-                xaxis='phase', yaxis='amp',
-                plotrange=[-50,50,0.5,1.5],
-                showgui=INTERACTIVE,
-                figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_ampvsphase.png' % (calnum,spwn),
-                iteration='spw' if INTERACTIVE else '')#, subplot = 221)
+        #plotcal(caltable=caltable,
+        #        xaxis='phase', yaxis='amp',
+        #        plotrange=[-50,50,0.5,1.5],
+        #        showgui=INTERACTIVE,
+        #        figfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_ampvsphase.png' % (calnum,spwn),
+        #        iteration='spw' if INTERACTIVE else '')#, subplot = 221)
 
         # THERE WILL BE WEIRD "LUSTRE" ERRORS GENERATED BY THE FILE SYSTEM. DO
         # NOT FREAK OUT. These are just a feature of our fast file
@@ -354,18 +373,18 @@ for calnum in xrange(10):
                 plotfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_uvdistamp.png' % (calnum,spwn),
                 )
 
-        plotms(vis=avg_data,
-                xaxis='phase',
-                yaxis='amp',
-                xdatacolumn='corrected',
-                ydatacolumn='corrected',
-                avgtime='60s',
-                avgchannel='8',
-                coloraxis='corr',
-                overwrite=True,
-                title='Iteration %i for spw %i' % (calnum,spw),
-                plotfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_phaseamp.png' % (calnum,spwn),
-                )
+        #plotms(vis=avg_data,
+        #        xaxis='phase',
+        #        yaxis='amp',
+        #        xdatacolumn='corrected',
+        #        ydatacolumn='corrected',
+        #        avgtime='60s',
+        #        avgchannel='8',
+        #        coloraxis='corr',
+        #        overwrite=True,
+        #        title='Iteration %i for spw %i' % (calnum,spw),
+        #        plotfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_phaseamp.png' % (calnum,spwn),
+        #        )
 
         plotms(vis=avg_data,
                 xaxis='time',
@@ -412,11 +431,30 @@ for calnum in xrange(10):
     # (6) Plot corrected phase vs. amp for the antennas you picked out in (4),
     # to check that in fact the corrections have been applied as expected.
     for ant in antnames:
+        plotms(vis=avg_data, xaxis='time', yaxis='phase',
+                xdatacolumn='corrected', ydatacolumn='corrected',
+                avgtime='60s', avgchannel='8', coloraxis='corr',
+                overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
+                plotfile=outdir+'selfcal%i_spw%i_ant%s_phasetime_applied.png' % (calnum,spwn,ant),)
+        plotms(vis=avg_data, xaxis='time', yaxis='amp',
+                xdatacolumn='corrected', ydatacolumn='corrected',
+                avgtime='60s', avgchannel='8', coloraxis='corr',
+                overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
+                plotfile=outdir+'selfcal%i_spw%i_ant%s_amptime_applied.png' % (calnum,spwn,ant),)
         plotms(vis=avg_data, xaxis='phase', yaxis='amp',
                 xdatacolumn='corrected', ydatacolumn='corrected',
                 avgtime='60s', avgchannel='8', coloraxis='corr',
                 overwrite=True, title='Iteration %i for spw %i and ant %s' % (calnum,spw,ant), 
                 plotfile=outdir+'selfcal%i_spw%i_ant%s_phaseamp_applied.png' % (calnum,spwn,ant),)
+        plotms(vis=vis, spw='0', xaxis='freq', yaxis='phase', avgtime='1e8',
+                avgscan=T, coloraxis='corr', iteraxis='baseline', xselfscale=T,
+                yselfscale=T,
+                antenna=ant,
+                title='Phase vs Freq with time averaging for spw %i ant %s iter %i' % (spw,ant,calnum),
+                plotfile=outdir+'phasevsfreq_spw%i_ant%s_selfcal%i.png' % (spwn,ant,calnum),
+                field=field,
+                overwrite=True,
+                )
     
 
     # Use this command to roll back to the previous flags in the event of
@@ -473,7 +511,7 @@ os.system("rm -rf "+selfcal_image+".model")
 os.system("rm -rf "+selfcal_image+".flux")
 os.system("rm -rf "+selfcal_image+".psf")
 os.system("rm -rf "+selfcal_image+".residual")
-clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', 
+clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', mask=cleanboxes,
         weighting='briggs', robust=0.5, niter=10000, imsize=512)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
@@ -493,15 +531,9 @@ os.system("rm -rf "+selfcal_image+".model")
 os.system("rm -rf "+selfcal_image+".flux")
 os.system("rm -rf "+selfcal_image+".psf")
 os.system("rm -rf "+selfcal_image+".residual")
-clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency', 
+clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency', mask=cleanboxes,
         weighting='briggs', robust=0.5, niter=10000, imsize=512)
 exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
 print imrms
 
-uvcontsub2(vis=noavg_data,fitspw='0:65~500;650~970', want_cont=T)
-clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency', 
-        weighting='briggs', robust=0.5, niter=10000, imsize=512, spw='0:65~970', restfreq='14.488479GHz',
-        threshold='10mJy')
-# expected sensitivity is 1.52 mJy in 68m with 27 antennae and 15.625 kHz bw
-exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
