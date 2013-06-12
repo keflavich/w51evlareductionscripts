@@ -36,8 +36,11 @@ clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W51 Ku',
         outdir_template="spw%i_selfcal_iter/", statsbox='170,50,229,97', ant1list=['ea14','ea05'],
         ant2list=['ea16','ea07'], avgchannel_wide='128', avgchannel_narrow='8',
-        cleanboxes=cleanboxes, refant='ea27', solint='30s', niter=1,
-        multiscale=[0,5,10,15,25], imsize=512, ):
+        cleanboxes=cleanboxes, refant='ea27', solint='30s', niter=2,
+        multiscale=[0,5,10,15,25,50], imsize=512, ):
+    """
+    Docstring incomplete
+    """
 
     spw = int(spwn)
     outdir = outdir_template % spwn
@@ -114,6 +117,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
             title='Model Amp vs Time after split for spw %i.  Should be all 1s' % spwn,
             plotfile=outdir+'ampvstime_model_shouldbe1.png', field=field,
             overwrite=True,)
+    delmod(vis=avg_data)
 
     plotms(vis=avg_data, spw='0', xaxis='phase', yaxis='amp',
             avgchannel=avgchannel_wide, xdatacolumn='data', ydatacolumn='data', avgscan=F,
@@ -154,14 +158,15 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                 psfmode='hogbom',multiscale=multiscale,
                 weighting='briggs', robust=0.5, niter=100, imsize=imsize,
                 mask=cleanboxes,
+                nterms=2,
                 usescratch=True)
-        viewer(imagename+".image",
-                outfile=outdir+imagename+".image.png",
+        viewer(imagename+".image.tt0",
+                outfile=outdir+imagename+".image.tt0.png",
                 outformat='png',
                 gui=False)
-        exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+        exportfits(imagename=imagename+".image.tt0", fitsimage=imagename+".fits", overwrite=True)
 
-    imrms = [imstat(imagename+".image",box=statsbox)['rms']]
+    imrms = [imstat(imagename+".image.tt0",box=statsbox)['rms']]
 
     # FAILS!!!!
     #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
@@ -188,11 +193,12 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                     psfmode='hogbom',multiscale=multiscale,
                     weighting='briggs', robust=0.5, niter=100, imsize=imsize,
                     mask=cleanboxes,
+                    nterms=2,
                     usescratch=True)
-            exportfits(imagename=first_image+".image", fitsimage=first_image+".fits", overwrite=True)
+            exportfits(imagename=first_image+".image.tt0", fitsimage=first_image+".fits", overwrite=True)
 
-        viewer(first_image+".image",
-                outfile=outdir+first_image+".image.png",
+        viewer(first_image+".image.tt0",
+                outfile=outdir+first_image+".image.tt0.png",
                 outformat='png',
                 gui=False)
 
@@ -332,9 +338,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                     yaxis='amp',
                     xdatacolumn='corrected',
                     ydatacolumn='corrected',
-                    avgtime='60s',
+                    avgtime='1e8s',
                     avgchannel=avgchannel_narrow,
-                    coloraxis='corr',
+                    coloraxis='baseline',
                     overwrite=True,
                     title='Iteration %i for spw %i' % (calnum,spw),
                     plotfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_uvdistamp.png' % (calnum,spwn),
@@ -358,9 +364,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                     yaxis='amp',
                     xdatacolumn='corrected',
                     ydatacolumn='corrected',
-                    avgtime='60s',
+                    avgtime='10s',
                     avgchannel=avgchannel_narrow,
-                    coloraxis='corr',
+                    coloraxis='baseline',
                     overwrite=True,
                     title='Iteration %i for spw %i' % (calnum,spw),
                     plotfile='' if INTERACTIVE else outdir+'selfcal%i_spw%i_amptime.png' % (calnum,spwn),
@@ -443,15 +449,46 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                 os.system("rm -rf "+selfcal_image+suffix)
             clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
                     psfmode='hogbom',multiscale=multiscale,
-                    weighting='briggs', robust=0.5, niter=100, imsize=imsize,
+                    weighting='briggs', robust=0.5, niter=1000, imsize=imsize,
+                    nterms=2,
                     mask=cleanboxes,
                     usescratch=True)
-            exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+            exportfits(imagename=selfcal_image+".image.tt0", fitsimage=selfcal_image+".fits", overwrite=True)
 
-        imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
+            plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',
+                    ydatacolumn='corrected-model',
+                    avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
+                    yselfscale=T,
+                    title='Residual vs. Baseline after CSCLEAN iter %i' % calnum,
+                    plotfile=outdir+'post_selfcal%i_spw%i_residVSbaseline.png' % (calnum,spwn),
+                    field=field,
+                    overwrite=True,
+                    )
+                
+            plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp', avgtime='5s',
+                    ydatacolumn='corrected-model', 
+                    coloraxis='baseline', iteraxis='', xselfscale=T,
+                    yselfscale=T,
+                    title='Residual vs. Time after CSCLEAN iter %i' % (calnum),
+                    plotfile=outdir+'post_selfcal%i_spw%i_residVStime.png' % (calnum,spwn),
+                    field=field,
+                    overwrite=True,
+                    )
 
-        viewer(selfcal_image+".image",
-                outfile=outdir+selfcal_image+".image.png",
+            plotms(vis=avg_data, spw='0', xaxis='uvdist', yaxis='amp', avgtime='1e8',
+                    ydatacolumn='corrected-model', 
+                    avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
+                    yselfscale=T,
+                    title='Residual vs. UVDIST after CSCLEAN iter %i' % (calnum) ,
+                    plotfile=outdir+'post_selfcal%i_spw%i_residVSuvdist.png' % (calnum,spwn),
+                    field=field,
+                    overwrite=True,
+                    )
+
+        imrms.append(imstat(selfcal_image+".image.tt0",box=statsbox)['rms'])
+
+        viewer(selfcal_image+".image.tt0",
+                outfile=outdir+selfcal_image+".image.tt0.png",
                 outformat='png',
                 gui=False)
 
@@ -484,23 +521,23 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
             weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
             nterms=2,
             usescratch=True)
-    exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+    exportfits(imagename=selfcal_image+".image.tt0", fitsimage=selfcal_image+".fits", overwrite=True)
 
     plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',
             ydatacolumn='corrected-model',
-            avgscan=T, coloraxis='corr', iteraxis='', xselfscale=T,
+            avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. Baseline after CSCLEAN',
+            title='Residual vs. Baseline after CSCLEAN iter %i' % calnum,
             plotfile=outdir+'post_selfcal%i_spw%i_residVSbaseline.png' % (calnum,spwn),
             field=field,
             overwrite=True,
             )
         
-    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp', avgtime='',
+    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp', avgtime='5s',
             ydatacolumn='corrected-model', 
-            avgscan=T, coloraxis='ant1', iteraxis='', xselfscale=T,
+            coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. Time after CSCLEAN',
+            title='Residual vs. Time after CSCLEAN iter %i' % (calnum),
             plotfile=outdir+'post_selfcal%i_spw%i_residVStime.png' % (calnum,spwn),
             field=field,
             overwrite=True,
@@ -508,9 +545,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
     plotms(vis=avg_data, spw='0', xaxis='uvdist', yaxis='amp', avgtime='1e8',
             ydatacolumn='corrected-model', 
-            avgscan=T, coloraxis='ant1', iteraxis='', xselfscale=T,
+            avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. UVDIST after CSCLEAN',
+            title='Residual vs. UVDIST after CSCLEAN iter %i' % (calnum) ,
             plotfile=outdir+'post_selfcal%i_spw%i_residVSuvdist.png' % (calnum,spwn),
             field=field,
             overwrite=True,
@@ -524,23 +561,23 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
             nterms=2,
             weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
             usescratch=True)
-    exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
+    exportfits(imagename=selfcal_image+".image.tt0", fitsimage=selfcal_image+".fits", overwrite=True)
 
     plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',
             ydatacolumn='corrected-model',
-            avgscan=T, coloraxis='corr', iteraxis='', xselfscale=T,
+            avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. Baseline after multiscale CLEAN',
+            title='Residual vs. Baseline after multiscale CLEAN iter %i' % (calnum),
             plotfile=outdir+'post_selfcal%i_spw%i_residVSbaseline_multiscale.png' % (calnum,spwn),
             field=field,
             overwrite=True,
             )
         
-    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp', avgtime='',
+    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp', avgtime='5s',
             ydatacolumn='corrected-model', 
-            avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
+            coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. Time after multiscale CLEAN',
+            title='Residual vs. Time after multiscale CLEAN iter %i' % (calnum),
             plotfile=outdir+'post_selfcal%i_spw%i_residVStime_multiscale.png' % (calnum,spwn),
             field=field,
             overwrite=True,
@@ -548,9 +585,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
     plotms(vis=avg_data, spw='0', xaxis='uvdist', yaxis='amp', avgtime='1e8',
             ydatacolumn='corrected-model', 
-            avgscan=T, coloraxis='ant1', iteraxis='', xselfscale=T,
+            avgscan=T, coloraxis='baseline', iteraxis='', xselfscale=T,
             yselfscale=T,
-            title='Residual vs. UVDIST after multiscale CLEAN',
+            title='Residual vs. UVDIST after multiscale CLEAN iter %i' % (calnum),
             plotfile=outdir+'post_selfcal%i_spw%i_residVSuvdist_multiscale.png' % (calnum,spwn),
             field=field,
             overwrite=True,
