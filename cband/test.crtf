@@ -1,0 +1,4 @@
+#CRTFv0 CASA Region Text Format version 0
+box [[19:23:50.68287, +014.30.08.4874], [19:23:48.07278, +014.30.34.0856]] coord=J2000, linewidth=1, linestyle=-, symsize=1, symthick=1, color=magenta, font="Lucida Grande", fontsize=11, fontstyle=normal, usetex=false
+box [[19:23:40.65457, +014.30.36.4104], [19:23:35.05939, +014.31.40.7222]] coord=J2000, linewidth=1, linestyle=-, symsize=1, symthick=1, color=magenta, font="Lucida Grande", fontsize=11, fontstyle=normal, usetex=false
+box [[19:23:42.22800, +014.29.05.0122], [19:23:38.20708, +014.29.58.3264]] coord=J2000, linewidth=1, linestyle=-, symsize=1, symthick=1, color=magenta, font="Lucida Grande", fontsize=11, fontstyle=normal, usetex=false
