@@ -30,19 +30,28 @@ clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 #  listed explicitly because some may need to be excluded
 SPWs = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,0,1,2,]
 CONT_SPWs = [3,4,5,6,8,9,10,12,14,16,18,20,21,0,1,2,]
+LINE_SPWs = [6,17,11,13,15,19]
+# change SPWs to be one of the three above... (SPWs or LINE_SPWs make most sense)
 for spwn in SPWs:
 
     field = "W51 Ku"
 
-    avg_data = '%s_spw%i_AVG.ms' % (field.replace(" ",""),spwn)
+    if spwn in LINE_SPWs:
+        width = 1
 
-    os.system("rm -rf "+avg_data)
+        avg_data = '%s_spw%i_split.ms' % (field.replace(" ",""),spwn)
 
-    width = 8
+        os.system("rm -rf "+avg_data)
+    else:
+        width = 8
+
+        avg_data = '%s_spw%i_AVG.ms' % (field.replace(" ",""),spwn)
+
+        os.system("rm -rf "+avg_data)
 
     split(vis=vis,
           outputvis=avg_data,
-          datacolumn='corrected', # was 'data'...
+          datacolumn='corrected', # was 'data'... but assume it went through pipeline
           #timebin='10s',
           width=width,
           field=field,
