@@ -156,7 +156,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
         clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
                 psfmode='hogbom',multiscale=multiscale,
-                weighting='briggs', robust=0.5, niter=100, imsize=imsize,
+                weighting='briggs', robust=0.0, niter=100, imsize=imsize,
                 mask=cleanboxes,
                 nterms=2,
                 usescratch=True)
@@ -180,9 +180,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     for calnum in xrange(niter):
 
         # for Ku D W51 Ku spw 2
-        caltable = 'selfcal%i_%s_spw%i.gcal' % (calnum,field.replace(" ",""),spwn)
         if reclean:
-            os.system('rm -rf '+caltable)
 
             first_image = 'spw%i_ku_d_firstim_selfcal%i' % (spwn,calnum)
 
@@ -191,7 +189,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
             clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
                     psfmode='hogbom',multiscale=multiscale,
-                    weighting='briggs', robust=0.5, niter=100, imsize=imsize,
+                    weighting='briggs', robust=0.0, niter=100, imsize=imsize,
                     mask=cleanboxes,
                     nterms=2,
                     usescratch=True)
@@ -212,7 +210,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
         # DONE avg/split ing
 
+        caltable = 'selfcal%i_%s_spw%i.pcal' % (calnum,field.replace(" ",""),spwn)
         if reclean:
+            os.system('rm -rf '+caltable)
             gaincal(vis=avg_data,
                     field='',
                     caltable=caltable,
