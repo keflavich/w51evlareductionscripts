@@ -168,6 +168,14 @@ OK, now I'll try to move on to the amp + phase cal.
              interp='linear',
              flagbackup=True)
     clean(vis='ch3oh_maser.ms', imsize=512, imagename='ch3oh_maser_ampphase')
-    imstat('ch3oh_maser_rd3.image',box=statsbox)['rms']
-    # 0.10188296
+    imstat('ch3oh_maser_ampphase.image',box=statsbox)['rms']
+    # 0.08872171
     viewer(infile='ch3oh_maser_ampphase')
+
+
+    peakbox = '217,247,228,258'
+    peaks = [imstat(img,box=peakbox)['max']
+             for img in ('ch3oh_maser_rd1.image','ch3oh_maser_rd2.image','ch3oh_maser_rd3.image','ch3oh_maser_ampphase.image')]
+    # [ 87.95651245,  88.58364105,  88.65736389,  87.88169861]
+
+So with the final cal, there is again significant RMS improvement, but no real change in the peak.
