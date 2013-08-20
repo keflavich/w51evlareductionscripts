@@ -18,14 +18,14 @@ W51 CH3OH Maser Self-Cal
     """
     vis = 'ch3oh_maser.ms'
     solint = '3s'
-    caltable = 'ch3oh_phasecal_rd1.cal'
+    caltable1 = 'ch3oh_phasecal_rd1.cal'
     gaincal(vis=vis,
                field='',
-               caltable=caltable,
+               caltable=caltable1,
                spw='',
                gaintype='G', 
                solint=solint,
-               refant=refant,
+               refant='',
                calmode='p')
     """
      Insufficient unflagged antennas to proceed with this solve.
@@ -34,7 +34,7 @@ W51 CH3OH Maser Self-Cal
        (time=2013/06/04/12:18:17.5 field=0 spw=0 chan=0)
     """
 
-    plotcal(caltable=caltable, yaxis='phase')
+    plotcal(caltable=caltable1, yaxis='phase')
     # INFO2 Number of points being plotted : 38542
 
 
@@ -50,9 +50,9 @@ antenna that is wrapping is
 
 .. code-block:: python
 
-   plotcal(caltable=caltable, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R.png')
+   plotcal(caltable=caltable1, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R.png')
    # flagged from 12:43:45~12:54:40
-   plotcal(caltable=caltable, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R_flagged.png')
+   plotcal(caltable=caltable1, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R_flagged.png')
 
 
 .. figure:: plots/ch3oh_maser_phasecal_rd1_ea23R.png
@@ -67,8 +67,9 @@ antenna that is wrapping is
 
 
 .. code-block:: python
+
     applycal(vis=vis,
-        gaintable=caltable,
+        gaintable=caltable1,
         interp='linear',
         flagbackup=True)
 
@@ -96,12 +97,77 @@ antenna that is wrapping is
 
 .. code-block:: python
 
-    caltable = 'ch3oh_phasecal_rd2.cal'
+    caltable2 = 'ch3oh_phasecal_rd2.cal'
     gaincal(vis=vis,
                field='',
-               caltable=caltable,
+               caltable=caltable2,
                spw='',
                gaintype='G', 
                solint=solint,
-               refant=refant,
+               refant='',
                calmode='p')
+    """
+    Insufficient unflagged antennas to proceed with this solve.
+     (time=2013/06/04/11:51:22.5 field=0 spw=0 chan=0)
+    Insufficient unflagged antennas to proceed with this solve.
+     (time=2013/06/04/12:18:17.5 field=0 spw=0 chan=0)
+    """
+    plotcal(caltable=caltable2, yaxis='phase', figfile='plots/ch3oh_maser_phasecal_rd2.png')
+
+.. figure:: plots/ch3oh_maser_phasecal_rd2.png
+   :width: 800px
+
+   Round 2 of phase-only self-cal.  Looks good.
+
+.. code-block:: python
+
+    applycal(vis=vis,
+        gaintable=caltable2,
+        interp='linear',
+        flagbackup=True)
+
+    clean(vis='ch3oh_maser.ms', imsize=512, imagename='ch3oh_maser_rd3')
+    imstat('ch3oh_maser_rd3.image',box=statsbox)['rms']
+    # 0.10188296
+
+Only a 2% improvement this time; probably done.
+
+
+OK, now I'll try to move on to the amp + phase cal.
+
+.. code-block:: python
+
+    caltable_gp = 'ch3oh_ampphase.cal'
+    gaincal(vis=vis,
+            field='',
+            caltable=caltable_gp,
+            gaintable=caltable2,
+            spw='',
+            gaintype='G', 
+            solint='30s',
+            refant='',
+            calmode='ap')
+    plotcal(caltable=caltable_gp, yaxis='phase', figfile='plots/ch3oh_maser_ampphasecal_phase.png')
+    plotcal(caltable=caltable_gp, yaxis='amp', figfile='plots/ch3oh_maser_ampphasecal_amp.png')
+
+.. figure:: plots/ch3oh_maser_ampphasecal_phase.png
+   :width: 800px
+
+   Miniscule phase changes; that's good.
+
+.. figure:: plots/ch3oh_maser_ampphasecal_amp.png
+   :width: 800px
+   
+   Whopping amplitude changes for some antennae, but contiguous.  Is this ok?           
+
+
+.. code-block:: python
+
+    applycal(vis=vis,
+             gaintable=[caltable2,caltable_gp],
+             interp='linear',
+             flagbackup=True)
+    clean(vis='ch3oh_maser.ms', imsize=512, imagename='ch3oh_maser_ampphase')
+    imstat('ch3oh_maser_rd3.image',box=statsbox)['rms']
+    # 0.10188296
+    viewer(infile='ch3oh_maser_ampphase')
