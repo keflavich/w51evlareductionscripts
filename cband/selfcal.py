@@ -39,7 +39,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
         outdir_template="spw%i_selfcal_iter/", statsbox='170,50,229,97', ant1list=['ea14','ea05'],
         ant2list=['ea16','ea07'], avgchannel_wide='128', avgchannel_narrow='8',
         cleanboxes=cleanboxes, refant='ea27', solint='30s', niter=2,
-        multiscale=[0,5,10,15,25,50], imsize=512, ):
+        multiscale=[0,5,10,15,25,50], imsize=512, robust=0.0 ):
     """
     Docstring incomplete
     """
@@ -97,7 +97,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     # os.system("rm -rf "+imagename+".psf")
     # os.system("rm -rf "+imagename+".residual")
     # clean(vis=vis, field=field, imagename=imagename, mode='mfs', 
-    #         weighting='briggs', robust=0.5, niter=500, imsize=512)
+    #         weighting='briggs', robust=robust, niter=500, imsize=512)
     # viewer(imagename+".image",
     #         outfile=outdir+imagename+".image.png",
     #         outformat='png',
@@ -138,7 +138,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     #        os.system("rm -rf "+imagename+suffix)
 
     #    clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
-    #            weighting='briggs', robust=0.5, niter=100, imsize=512)
+    #            weighting='briggs', robust=robust, niter=100, imsize=512)
     #    viewer(imagename+".image",
     #            outfile=outdir+imagename+".image.png",
     #            outformat='png',
@@ -158,7 +158,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
         clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
                 psfmode='hogbom',multiscale=multiscale,
-                weighting='briggs', robust=0.5, niter=100, imsize=imsize,
+                weighting='briggs', robust=robust, niter=100, imsize=imsize,
                 mask=cleanboxes,
                 nterms=2,
                 usescratch=True)
@@ -182,9 +182,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     for calnum in xrange(niter):
 
         # for Ku D W51 Ku spw 2
-        caltable = 'selfcal%i_%s_spw%i.gcal' % (calnum,field.replace(" ",""),spwn)
         if reclean:
-            os.system('rm -rf '+caltable)
 
             first_image = 'spw%i_C_C_firstim_selfcal%i' % (spwn,calnum)
 
@@ -193,7 +191,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
             clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
                     psfmode='hogbom',multiscale=multiscale,
-                    weighting='briggs', robust=0.5, niter=100, imsize=imsize,
+                    weighting='briggs', robust=robust, niter=100, imsize=imsize,
                     mask=cleanboxes,
                     nterms=2,
                     usescratch=True)
@@ -214,7 +212,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
 
         # DONE avg/split ing
 
+        caltable = 'selfcal%i_%s_spw%i.gcal' % (calnum,field.replace(" ",""),spwn)
         if reclean:
+            os.system('rm -rf '+caltable)
             gaincal(vis=avg_data,
                     field='',
                     caltable=caltable,
@@ -451,7 +451,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
                 os.system("rm -rf "+selfcal_image+suffix)
             clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
                     psfmode='hogbom',multiscale=multiscale,
-                    weighting='briggs', robust=0.5, niter=1000, imsize=imsize,
+                    weighting='briggs', robust=robust, niter=1000, imsize=imsize,
                     nterms=2,
                     mask=cleanboxes,
                     usescratch=True)
@@ -520,7 +520,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', mask=cleanboxes,
-            weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
+            weighting='briggs', robust=robust, niter=10000, imsize=imsize,
             nterms=2,
             usescratch=True)
     exportfits(imagename=selfcal_image+".image.tt0", fitsimage=selfcal_image+".fits", overwrite=True)
@@ -561,7 +561,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', imagermode='csclean',# mask=cleanboxes,
             multiscale=multiscale, psfmode='hogbom',
             nterms=2,
-            weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
+            weighting='briggs', robust=robust, niter=10000, imsize=imsize,
             usescratch=True)
     exportfits(imagename=selfcal_image+".image.tt0", fitsimage=selfcal_image+".fits", overwrite=True)
 
@@ -619,6 +619,6 @@ def apply_selfcal(rawvis, field, spwn_source, spwn_target, calnum=0):
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency',# mask=cleanboxes,
             multiscale=[0,5,10,25], psfmode='hogbom',
-            weighting='briggs', robust=0.5, niter=10000, imsize=512)
+            weighting='briggs', robust=robust, niter=10000, imsize=512)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 

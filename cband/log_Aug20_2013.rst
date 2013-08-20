@@ -1,0 +1,107 @@
+W51 CH3OH Maser Self-Cal
+========================
+
+.. code-block:: python
+
+    split(spw='7:580~600', vis='13A-064.sb21341436.eb23334759.56447.48227415509.ms', outputvis='ch3oh_maser.ms', field='W51 Ku')
+    clean(vis='ch3oh_maser.ms', imsize=512, imagename='ch3oh_maser_rd1.image')
+    """
+    (ch3oh_maser_rd1.image)
+            Stokes       Velocity          Frame        Doppler      Frequency
+                 I   -33.9408km/s           LSRK          RADIO    6.66798e+09
+    BrightnessUnit       BeamArea           Npts            Sum    FluxDensity
+           Jy/beam        18.4952          33033  -9.758288e+02  -5.276112e+01
+              Mean            Rms        Std dev        Minimum        Maximum
+     -2.954103e-02   1.230303e-01   1.194329e-01  -7.456788e-01   7.790660e-01
+      region count
+                 1
+    """
+    vis = 'ch3oh_maser.ms'
+    solint = '3s'
+    caltable = 'ch3oh_phasecal_rd1.cal'
+    gaincal(vis=vis,
+               field='',
+               caltable=caltable,
+               spw='',
+               gaintype='G', 
+               solint=solint,
+               refant=refant,
+               calmode='p')
+    """
+     Insufficient unflagged antennas to proceed with this solve.
+       (time=2013/06/04/11:51:22.5 field=0 spw=0 chan=0)
+     Insufficient unflagged antennas to proceed with this solve.
+       (time=2013/06/04/12:18:17.5 field=0 spw=0 chan=0)
+    """
+
+    plotcal(caltable=caltable, yaxis='phase')
+    # INFO2 Number of points being plotted : 38542
+
+
+.. image:: plots/ch3oh_maser_phasecal_rd1.png
+   :width: 800px
+   
+There is clearly something wrong at a few times; I hand-flagged those.  The dark green
+antenna that is wrapping is
+
+::
+
+   2013-08-20 19:01:46 INFO  	2013/06/04/12:50:47.5  Antenna='ea23' SpwId=0 Field='W51 Ku' pol,chan=[0,0] 
+
+.. code-block:: python
+
+   plotcal(caltable=caltable, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R.png')
+   # flagged from 12:43:45~12:54:40
+   plotcal(caltable=caltable, yaxis='phase', antenna='ea23', poln='R', figfile='plots/ch3oh_maser_phasecal_rd1_ea23R_flagged.png')
+
+
+.. figure:: plots/ch3oh_maser_phasecal_rd1_ea23R.png
+   :width: 800px
+           
+   Before flagging, ea23
+
+.. figure:: plots/ch3oh_maser_phasecal_rd1_ea23R_flagged.png
+   :width: 800px
+
+   After flagging, ea23
+
+
+.. code-block:: python
+    applycal(vis=vis,
+        gaintable=caltable,
+        interp='linear',
+        flagbackup=True)
+
+    clean(vis='ch3oh_maser.ms', imsize=512, imagename='ch3oh_maser_rd2')
+    """
+    (ch3oh_maser_rd2.image)
+            Stokes       Velocity          Frame        Doppler      Frequency
+                 I   -33.9408km/s           LSRK          RADIO    6.66798e+09
+    BrightnessUnit       BeamArea           Npts            Sum    FluxDensity
+           Jy/beam        18.7481          26883  -8.861679e+02  -4.726703e+01
+              Mean            Rms        Std dev        Minimum        Maximum
+     -3.296388e-02   1.104338e-01   1.054012e-01  -4.735539e-01   7.208058e-01
+      region count
+                 1
+    """    
+
+
+    statsbox='170,50,229,97'
+    imstat('ch3oh_maser_rd1.image',box=statsbox)['rms']
+    # 0.12654169
+    imstat('ch3oh_maser_rd2.image',box=statsbox)['rms']
+    # 0.10412835
+
+20% improvement.  Let's try another round.
+
+.. code-block:: python
+
+    caltable = 'ch3oh_phasecal_rd2.cal'
+    gaincal(vis=vis,
+               field='',
+               caltable=caltable,
+               spw='',
+               gaintype='G', 
+               solint=solint,
+               refant=refant,
+               calmode='p')
