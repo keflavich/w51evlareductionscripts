@@ -252,7 +252,7 @@ probably won't finish for a day
    imagename = 'allspw_continuum_selfcal_by_maser'
    clean(vis=vis, imagename=imagename, field='W51 Ku', mode='mfs', 
          weighting='briggs', robust=0, niter=10000, spw='',
-         multiscale=[0,5,15,100,200],
+         multiscale=[0,2,5,10,15,30,100,200],
          imsize=imsize, cell='0.5 arcsec')
 
 Hmm, this did *not* work, I got these errors:
@@ -267,6 +267,8 @@ Hmm, this did *not* work, I got these errors:
     2013-08-21 03:44:53     WARN    applycal::Calibrater::correct+      Please check your results carefully!
 
 So do I have to trick applycal to work on these?
+
+(but the data still look beautiful...)
 
 ..  
 
