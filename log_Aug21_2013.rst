@@ -1,3 +1,15 @@
+W51 Ku-band calibration
+=======================
+
+.. code-block:: python
+
+     vis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
+     setjy(vis=vis, field='0137+331=3C48', scalebychan=True, modimage='3C48_C.im', usescratch=False)
+     gencal(vis=vis,caltable='calKu.antpos',caltype='antpos',antenna='')
+     gencal(vis=vis,caltable='calKu.gaincurve',caltype='gc')
+
+
+
 W51 Ku-band Continuum Self-Cal
 ==============================
 
