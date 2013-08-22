@@ -61,7 +61,7 @@ Not a good sign.
     gaincal(vis=vis, field='',caltable=caltable2,spw='',gaintype='G',solint='3s',refant='',calmode='p')
     plotcal(caltable=caltable2, yaxis='phase', figfile='plots/ku_continuum_phasecal_rd2.png')
 
-.. image:: ku_continuum_phasecal_rd1.png
-.. image:: ku_continuum_phasecal_rd1_badants.png
-.. image:: ku_continuum_phasecal_rd1_flagged.png 
-.. image:: ku_continuum_phasecal_rd2.png
+.. image:: plots/ku_continuum_phasecal_rd1.png
+.. image:: plots/ku_continuum_phasecal_rd1_badants.png
+.. image:: plots/ku_continuum_phasecal_rd1_flagged.png 
+.. image:: plots/ku_continuum_phasecal_rd2.png
