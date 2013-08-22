@@ -1,0 +1,29 @@
+2013-03-03 23:51:04	INFO	ms::summary	Fields: 4
+2013-03-03 23:51:04	INFO	ms::summary+	  ID   Code Name                RA               Decl           Epoch   SrcId    nRows  nUnflRows
+2013-03-03 23:51:04	INFO	ms::summary+	  0    NONE 0137+331=3C48       01:37:41.299431 +33.09.35.13299 J2000   0       117936  117936.00
+2013-03-03 23:51:04	INFO	ms::summary+	  1    K    0137+331=3C48       01:37:41.299431 +33.09.35.13299 J2000   1      1444716  553854.00
+2013-03-03 23:51:04	INFO	ms::summary+	  2    D    J1922+1530          19:22:34.699188 +15.30.10.03213 J2000   2      1312038  718536.00
+2013-03-03 23:51:04	INFO	ms::summary+	  3    NONE W51 Ku              19:23:41.640000 +14.30.38.18000 J2000   3     10090899  249648.00
+2013-03-03 23:51:05	INFO	ms::summary	Spectral Windows:  (21 unique spectral windows and 1 unique polarization setups)
+2013-03-03 23:51:05	INFO	ms::summary+	  SpwID  Name            #Chans   Frame   Ch1(MHz)  ChanWid(kHz)  TotBW(kHz) BBC Num  Corrs  
+2013-03-03 23:51:05	INFO	ms::summary+	  0      EVLA_KU#A0C0#0     128   TOPO   12158.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  1      EVLA_KU#A0C0#1    1024   TOPO   12192.000         7.812      8000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  2      EVLA_KU#A0C0#2     128   TOPO   12286.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  3      EVLA_KU#A0C0#3     128   TOPO   12414.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  4      EVLA_KU#A0C0#4     128   TOPO   12542.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  5      EVLA_KU#A0C0#5     128   TOPO   12670.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  6      EVLA_KU#A0C0#6     128   TOPO   12798.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  7      EVLA_KU#A0C0#7     128   TOPO   12926.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  8      EVLA_KU#A0C0#8     128   TOPO   13054.000      1000.000    128000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  9      EVLA_KU#A0C0#9     512   TOPO   13155.782        31.250     16000.0      12  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  10     EVLA_KU#B0D0#10    128   TOPO   13688.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  11     EVLA_KU#B0D0#11   1024   TOPO   13768.520        15.625     16000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  12     EVLA_KU#B0D0#12    128   TOPO   13816.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  13     EVLA_KU#B0D0#13    128   TOPO   13944.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  14     EVLA_KU#B0D0#14    128   TOPO   14072.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  15     EVLA_KU#B0D0#15    512   TOPO   14110.272        62.500     32000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  16     EVLA_KU#B0D0#16    128   TOPO   14200.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  17     EVLA_KU#B0D0#17    128   TOPO   14328.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  18     EVLA_KU#B0D0#18    128   TOPO   14456.000      1000.000    128000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  19     EVLA_KU#B0D0#19   1024   TOPO   14478.082        15.625     16000.0      15  RR  LL
+2013-03-03 23:51:05	INFO	ms::summary+	  20     EVLA_KU#B0D0#20    128   TOPO   14584.000      1000.000    128000.0      15  RR  LL
