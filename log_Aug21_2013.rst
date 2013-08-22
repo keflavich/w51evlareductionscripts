@@ -1,0 +1,62 @@
+W51 Ku-band Continuum Self-Cal
+==============================
+
+Like with C-band, this represents an attempt to accurately self-cal the data. 
+The biggest changes here from the old attempt are:
+
+ 1. Use ALL continuum together
+ 2. Use a larger imsize for the models
+
+.. code-block:: python
+
+   split(vis='13A-064.sb18020284.eb19181492.56353.71736577546.ms',spw='0,2~8,10,12~14,16~18,20'
+   imsize=1024
+   clean(vis='W51Ku_continuum_bands.ms', imsize=imsize, imagename='ku_continuum_rd1')
+   caltable1 = 'allcont_phasecal_rd1.cal'
+   gaincal(vis=vis,field='',caltable=caltable1,spw='',gaintype='G',solint='3s',refant='',calmode='p')
+
+Got a lot of these messages::
+
+    2 of 46 solutions flagged due to SNR < 3 in spw=3 at 2013/03/02/17:49:10.5
+
+
+.. code-block:: python
+
+    imsize=1024
+    rd1 = 'ku_continuum_rd1'
+    statsbox='440,314,550,430'
+    rms = imstat(rd1+".image",box=statsbox)['rms']
+    peakbox = '528,535,547,552'
+    peak = imstat(rd1+".image",box=peakbox)['max']
+    print "S/N: ",peak/rms," N: ",rms
+    # S/N:  [ 59.64445149]  N:  [ 0.04121845]
+
+
+
+.. code-block:: python
+
+   plotcal(caltable=caltable1, yaxis='phase', figfile='plots/ku_continuum_phasecal_rd1.png')
+
+There are some bad antennae at some times.
+
+.. code-block:: python
+
+    plotcal(caltable=caltable1, yaxis='phase', figfile='plots/ku_continuum_phasecal_rd1_badants.png',antenna='ea21,ea20,ea24,ea19,ea22',spw='0,1,2,7,8,9,10')
+    plotcal(caltable=caltable1, yaxis='phase', figfile='plots/ku_continuum_phasecal_rd1_flagged.png')
+
+    applycal(vis=vis, gaintable=caltable1, interp='linear', flagbackup=True)
+    rd2 = 'ku_continuum_rd2'
+    clean(vis='W51Ku_continuum_bands.ms', imsize=imsize, imagename=rd2)
+
+    rms = imstat(rd2+".image",box=statsbox)['rms']
+    peak = imstat(rd2+".image",box=peakbox)['max']
+    print "S/N: ",peak/rms," N: ",rms
+    # S/N:  [ 53.53753382]  N:  [ 0.06048758]
+
+Not a good sign.
+
+.. code-block:: python
+
+    caltable2 = 'allcont_phasecal_rd2.cal'
+    gaincal(vis=vis, field='',caltable=caltable2,spw='',gaintype='G',solint='3s',refant='',calmode='p')
+    plotcal(caltable=caltable2, yaxis='phase', figfile='plots/ku_continuum_phasecal_rd2.png')
