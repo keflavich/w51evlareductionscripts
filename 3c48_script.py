@@ -46,9 +46,16 @@ gaincal(vis=vis, caltable='calKu.G3',
         spw='',
         solint='inf',combine='scan',gaintype='G',calmode='a',gaincurve=False)
 
-plotcal(caltable='calKu.G2int',xaxis='time',yaxis='phase', figfile='plots/3c48_G2cal_phase.png')
-plotcal(caltable='calKu.G2int',xaxis='time',yaxis='amp', figfile='plots/3c48_G2cal_amp.png')
-plotcal(caltable='calKu.G3int',xaxis='time',yaxis='phase', figfile='plots/3c48_G3cal_phase.png')
-plotcal(caltable='calKu.G3int',xaxis='time',yaxis='amp', figfile='plots/3c48_G3cal_amp.png')
+plotcal(caltable='calKu.G2',xaxis='time',yaxis='phase', figfile='plots/3c48_G2cal_phase.png')
+plotcal(caltable='calKu.G2',xaxis='time',yaxis='amp', figfile='plots/3c48_G2cal_amp.png')
+plotcal(caltable='calKu.G3',xaxis='time',yaxis='phase', figfile='plots/3c48_G3cal_phase.png')
+plotcal(caltable='calKu.G3',xaxis='time',yaxis='amp', figfile='plots/3c48_G3cal_amp.png')
+
+clean(vis=vis, imagename='3c48_Ku_junk', imsize=1024)
+
+applycal(vis=vis, field=flux_calibrator, 
+        gaintable=['calKu.gaincurve','calKu.G0','calKu.K0','calKu.B0','calKu.G1int','calKu.G2'],
+        interp=['','nearest','nearest','nearest','nearest','nearest'],
+        parang=False, calwt=False, gaincurve=False)
 
 clean(vis=vis, imagename='3c48_Ku', imsize=1024)
