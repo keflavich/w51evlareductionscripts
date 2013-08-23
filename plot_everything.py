@@ -16,14 +16,15 @@ def plot_everything(vis, ydatacolumn='data', async=True):
                  'baseline':'scan', 'uvdist':'scan'}
 
     for x,y in itertools.product(xaxes,yaxes):
-
+        plotfile = '{ms}_{dc}_{x}_vs_{y}.png'.format(
+                    ms=vis.replace(".ms",""), x=x, y=y,
+                    dc=ydatacolumn)
+        print "Attempting to plot %s vs %s with outfile %s" % (x,y,plotfile)
         plotms(vis=vis,xaxis=x,yaxis=y,
                 avgchannel=d_avgchannel[x],
                 avgtime=d_avgtime[x],
                 coloraxis=d_coloraxis[x],
                 async=async,
                 ydatacolumn=ydatacolumn,
-                plotfile='{ms}_{dc}_{x}_vs_{y}.png'.format(
-                    ms=vis.replace(".ms",""), x=x, y=y,
-                    dc=ydatacolumn)
+                plotfile=plotfile,
                 )
