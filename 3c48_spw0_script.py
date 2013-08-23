@@ -2,8 +2,8 @@ rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
 vis = '3c48_Ku_spw0.ms'
 flux_calibrator = '0137+331=3C48'
 refant='ea03'
-split(vis=rawvis, outputvis=vis, field=flux_calibrator, datacolumn='data', spw='0')
-setjy(vis=vis, field=flux_calibrator, scalebychan=True, modimage='3c48_spw0_C.im', usescratch=False)
+if not os.path.exists(vis): split(vis=rawvis, outputvis=vis, field=flux_calibrator, datacolumn='data', spw='0')
+setjy(vis=vis, field=flux_calibrator, scalebychan=True, modimage='3c48_C.im', usescratch=False)
 gencal(vis=vis,caltable='calKu_spw0.gaincurve',caltype='gc')
 gaincal(vis=vis,caltable='calKu_spw0.G0',field=flux_calibrator, spw='',
     gaintable=['calKu_spw0.gaincurve'],
@@ -46,10 +46,17 @@ gaincal(vis=vis, caltable='calKu_spw0.G3',
         spw='',
         solint='inf',combine='scan',gaintype='G',calmode='a',gaincurve=False)
 
-plotcal(caltable='calKu_spw0.G2int',xaxis='time',yaxis='phase', figfile='plots/3c48_spw0_G2cal_phase.png')
-plotcal(caltable='calKu_spw0.G2int',xaxis='time',yaxis='amp', figfile='plots/3c48_spw0_G2cal_amp.png')
-plotcal(caltable='calKu_spw0.G3int',xaxis='time',yaxis='phase', figfile='plots/3c48_spw0_G3cal_phase.png')
-plotcal(caltable='calKu_spw0.G3int',xaxis='time',yaxis='amp', figfile='plots/3c48_spw0_G3cal_amp.png')
+plotcal(caltable='calKu_spw0.G2',xaxis='time',yaxis='phase', figfile='plots/3c48_spw0_G2cal_phase.png')
+plotcal(caltable='calKu_spw0.G2',xaxis='time',yaxis='amp', figfile='plots/3c48_spw0_G2cal_amp.png')
+plotcal(caltable='calKu_spw0.G3',xaxis='time',yaxis='phase', figfile='plots/3c48_spw0_G3cal_phase.png')
+plotcal(caltable='calKu_spw0.G3',xaxis='time',yaxis='amp', figfile='plots/3c48_spw0_G3cal_amp.png')
 
-clean(vis=vis, imagename='3c48_spw0_Ku', imsize=1024)
+clean(vis=vis, imagename='3c48_Ku_spw0_junk', imsize=1024)
+
+applycal(vis=vis, field=flux_calibrator, 
+        gaintable=['calKu_spw0.gaincurve','calKu_spw0.G0','calKu_spw0.K0','calKu_spw0.B0','calKu_spw0.G1int','calKu_spw0.G2'],
+        interp=['','nearest','nearest','nearest','nearest','nearest'],
+        parang=False, calwt=False, gaincurve=False)
+
+clean(vis=vis, imagename='3c48_Ku_spw0', imsize=1024)
 
