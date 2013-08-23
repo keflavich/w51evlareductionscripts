@@ -1,9 +1,10 @@
 rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
 vis = '3c48_Ku_spw0.ms'
 flux_calibrator = '0137+331=3C48'
-refant='ea03'
+refant='ea27'
 split(vis=rawvis, outputvis=vis, field=flux_calibrator, datacolumn='data', spw='0')
-setjy(vis=vis, field=flux_calibrator, scalebychan=True, modimage='3c48_spw0_C.im', usescratch=False)
+flagdata(vis=vis, timerange='17:11:00~17:17:00')
+setjy(vis=vis, field=flux_calibrator, scalebychan=True, modimage='3c48_C.im', usescratch=False)
 gencal(vis=vis,caltable='calKu_spw0.gaincurve',caltype='gc')
 gaincal(vis=vis,caltable='calKu_spw0.G0',field=flux_calibrator, spw='',
     gaintable=['calKu_spw0.gaincurve'],
