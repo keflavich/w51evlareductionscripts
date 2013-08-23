@@ -7,6 +7,14 @@ have failed on spw0, which includes the (potential) 12.1 GHz masers.
 Based on this excessively complicated example:
 http://casaguides.nrao.edu/index.php?title=EVLA_6cmWideband_Tutorial_SN2010FZ_CASA_4.1
 
+
+.. code-block:: python
+
+     rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
+     vis = '3c48_Ku_test.ms'
+     calibrator = '0137+331=3C48'
+     split(vis=rawvis, outputvis=vis, field=calibrator, datacolumn='data', spw='0', width=8, timebin='10s')
+
 .. code-block:: python
 
      rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
@@ -41,6 +49,9 @@ http://casaguides.nrao.edu/index.php?title=EVLA_6cmWideband_Tutorial_SN2010FZ_CA
      plotcal(caltable='calKu.G1int',xaxis='time',yaxis='amp', figfile='plots/3c48_finalcal_amp.png')
      clean(vis=vis, imagename='3c48_Ku', imsize=1024)
 
+
+A refant is required, so I tried ea04.  Got this error:
+The following MS spws have no corresponding cal spws: 0 10
 
 
 W51 Ku-band Continuum Self-Cal
