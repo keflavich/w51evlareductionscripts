@@ -8,7 +8,7 @@ vis = '13A-064.sb18020284.eb19181492.56353.71736577546.ms'
 clean(vis=vis,
       field='W51 Ku',
       spw='2,3,4,5,6,7', # left out 0,8
-      imagename='W51Ku_Barray_continuum_low.hires.clean',
+      imagename='W51Ku_Darray_continuum_low.hires.clean',
       psfmode='hogbom',
       cell=['0.15 arcsec'],
       imsize=[768,768],
@@ -18,11 +18,11 @@ clean(vis=vis,
       multiscale=[0,5,10],
       outframe='LSRK',
       pbcor=T)
-exportfits('W51Ku_Barray_continuum_low.hires.clean.image','W51Ku_Barray_continuum_low.hires.clean.image.fits')
+exportfits('W51Ku_Darray_continuum_low.hires.clean.image','W51Ku_Darray_continuum_low.hires.clean.image.fits')
 clean(vis=vis,
       field='W51 Ku',
       spw='12,13,14,16,17,18', # left out 10,20
-      imagename='W51Ku_Barray_continuum_high.hires.clean',
+      imagename='W51Ku_Darray_continuum_high.hires.clean',
       psfmode='hogbom',
       cell=['0.15 arcsec'],
       imsize=[768,768],
@@ -32,4 +32,4 @@ clean(vis=vis,
       multiscale=[0,5,10],
       outframe='LSRK',
       pbcor=T)
-exportfits('W51Ku_Barray_continuum_high.hires.clean.image','W51Ku_Barray_continuum_high.hires.clean.image.fits')
+exportfits('W51Ku_Darray_continuum_high.hires.clean.image','W51Ku_Darray_continuum_high.hires.clean.image.fits')
