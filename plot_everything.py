@@ -72,11 +72,11 @@ def plot_amp_vs_time(vis):
 
     for spw in spws:
         plotms(vis=vis,
-               spw=spw,
+               spw=str(spw),
                xaxis='time',
                yaxis='amp',
                averagedata=True,
-               avgchannel=128,
+               avgchannel='128',
                coloraxis='antenna',
                customflaggedsymbol=True,
                flaggedsymbolshape = 'diamond',
@@ -84,7 +84,7 @@ def plot_amp_vs_time(vis):
                title='SPW %s channel-avg antenna-color' % spw,
                )
         plotms(vis=vis,
-               spw=spw,
+               spw=str(spw),
                xaxis='time',
                yaxis='amp',
                averagedata=True,
@@ -96,12 +96,12 @@ def plot_amp_vs_time(vis):
                title='SPW %s baseline-avg corr-color' % spw,
                )
         plotms(vis=vis,
-               spw=spw,
+               spw=str(spw),
                xaxis='time',
                yaxis='amp',
                averagedata=True,
                avgantenna=True,
-               coloraxis='antenna',
+               coloraxis='antenna1',
                customflaggedsymbol=True,
                flaggedsymbolshape = 'diamond',
                flaggedsymbolsize =          1,
