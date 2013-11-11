@@ -68,6 +68,8 @@ def plot_amp_vs_time(vis):
     spws = summary['scan_1']['0']['SpwIds']
     ms.close()
 
+    print "Plotting amp vs time for spws: ",spws
+
     for spw in spws:
         plotms(vis=vis,
                spw=spw,
