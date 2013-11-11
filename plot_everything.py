@@ -71,6 +71,7 @@ def plot_amp_vs_time(vis,name,overwrite=True):
     print "Plotting amp vs time for spws: ",spws
 
     for spw in spws:
+        print "Plotting spw ",spw
         plotms(vis=vis,
                spw=str(spw),
                xaxis='time',
