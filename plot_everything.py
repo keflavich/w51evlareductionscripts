@@ -61,7 +61,7 @@ def plot_everything(vis, ydatacolumn='data', async=False):
                 highres=True,
                 ))
 
-def plot_amp_vs_time(vis,name):
+def plot_amp_vs_time(vis,name,overwrite=True):
     ms.open(vis)
     summary = ms.summary()
 
@@ -83,6 +83,8 @@ def plot_amp_vs_time(vis,name):
                flaggedsymbolsize =          1,
                title='SPW %s channel-avg antenna-color' % spw,
                plotfile=name+"_spw%i_chanavg_antcolor.png" % spw,
+               overwrite=overwrite,
+               highres=True
                )
         plotms(vis=vis,
                spw=str(spw),
@@ -96,6 +98,8 @@ def plot_amp_vs_time(vis,name):
                flaggedsymbolsize =          1,
                title='SPW %s baseline-avg corr-color' % spw,
                plotfile=name+"_spw%i_baseavg_corrcolor.png" % spw,
+               overwrite=overwrite,
+               highres=True
                )
         plotms(vis=vis,
                spw=str(spw),
@@ -109,4 +113,6 @@ def plot_amp_vs_time(vis,name):
                flaggedsymbolsize =          1,
                title='SPW %s antenna-avg antenna-color' % spw,
                plotfile=name+"_spw%i_antavg_antcolor.png" % spw,
+               overwrite=overwrite,
+               highres=True
                )
