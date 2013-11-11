@@ -60,3 +60,48 @@ def plot_everything(vis, ydatacolumn='data', async=False):
                 expformat='png',
                 highres=True,
                 ))
+
+def plot_amp_vs_time(vis):
+    ms.open(vis)
+    summary = ms.summary()
+
+    spws = summary['scan_1']['0']['SpwIds']
+    ms.close()
+
+    for spw in spws:
+        plotms(vis=vis,
+               spw=spw,
+               xaxis='time',
+               yaxis='amp',
+               averagedata=True,
+               avgchannel=128,
+               coloraxis='antenna',
+               customflaggedsymbol=True,
+               flaggedsymbolshape = 'diamond',
+               flaggedsymbolsize =          1,
+               title='SPW %s channel-avg antenna-color' % spw,
+               )
+        plotms(vis=vis,
+               spw=spw,
+               xaxis='time',
+               yaxis='amp',
+               averagedata=True,
+               avgbaseline=True,
+               coloraxis='corr',
+               customflaggedsymbol=True,
+               flaggedsymbolshape = 'diamond',
+               flaggedsymbolsize =          1,
+               title='SPW %s baseline-avg corr-color' % spw,
+               )
+        plotms(vis=vis,
+               spw=spw,
+               xaxis='time',
+               yaxis='amp',
+               averagedata=True,
+               avgantenna=True,
+               coloraxis='antenna',
+               customflaggedsymbol=True,
+               flaggedsymbolshape = 'diamond',
+               flaggedsymbolsize =          1,
+               title='SPW %s antenna-avg antenna-color' % spw,
+               )
