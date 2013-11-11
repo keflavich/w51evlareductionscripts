@@ -1,14 +1,15 @@
-rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
+#rawvis='13A-064.sb18020284.eb19181492.56353.71736577546.ms'
+rawvis = '3c48_Ku.ms'
 vis = '3c48_Ku_spw0.ms'
 flux_calibrator = '0137+331=3C48'
 refant='ea27'
 split(vis=rawvis, outputvis=vis, field=flux_calibrator, datacolumn='data', spw='0')
-flagdata(vis=vis, timerange='17:11:00~17:17:00')
+flagdata(vis=vis, timerange='17:11:00~17:18:00')
 setjy(vis=vis, field=flux_calibrator, scalebychan=True, modimage='3c48_C.im', usescratch=False)
 gencal(vis=vis,caltable='calKu_spw0.gaincurve',caltype='gc')
 gaincal(vis=vis,caltable='calKu_spw0.G0',field=flux_calibrator, spw='',
     gaintable=['calKu_spw0.gaincurve'],
-    gaintype='G',refant=refant, calmode='p',solint='int',minsnr=3,gaincurve=False)
+    gaintype='G',refant=refant, calmode='p',solint='30s',minsnr=3,gaincurve=False)
 plotcal(caltable='calKu_spw0.G0',xaxis='time',yaxis='phase', figfile='plots/3c48_spw0_phasecal_phase.png')
 gaincal(vis=vis,caltable='calKu_spw0.K0',
     gaintable=['calKu_spw0.gaincurve','calKu_spw0.G0'],
