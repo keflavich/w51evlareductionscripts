@@ -77,7 +77,7 @@ def plot_amp_vs_time(vis):
                yaxis='amp',
                averagedata=True,
                avgchannel='128',
-               coloraxis='antenna',
+               coloraxis='antenna1',
                customflaggedsymbol=True,
                flaggedsymbolshape = 'diamond',
                flaggedsymbolsize =          1,
