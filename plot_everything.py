@@ -154,7 +154,7 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12)):
             continue
 
         print "Selecting %s..." % spw,
-        if not ms.msselect({'spw':spw}):
+        if not ms.msselect({'spw':str(spw)}):
             print "Failed to select spw %s.  Skipping." % spw
             continue
 
