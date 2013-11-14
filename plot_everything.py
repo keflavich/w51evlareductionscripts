@@ -169,6 +169,11 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         antavg_pol1 = amp[0,:,:,:].mean(axis=1)
         antavg_pol2 = amp[1,:,:,:].mean(axis=1)
 
+        avgspec_pol1 = timeavg_pol1.mean(axis=1)
+        avgspec_pol2 = timeavg_pol2.mean(axis=1)
+        avgts_pol1 = chanavg_pol1.mean(axis=2)
+        avgts_pol2 = chanavg_pol2.mean(axis=2)
+
         print "Plotting spw %s..." % spw
         pl.clf()
         pl.title("Channel Average, Polarization 1, SPW %s" % spw)
@@ -218,6 +223,20 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         pl.ylabel("Channel")
         pl.colorbar()
         pl.savefig(name+"_spw%i_antavg_pol2.png" % (int(spw)), bbox_inches='tight')
+
+        pl.clf()
+        pl.plot(avgspec_pol1)
+        pl.plot(avgspec_pol2)
+        pl.xlabel("Channel #")
+        pl.ylabel("Amplitude")
+        pl.savefig(name+"_spw%i_uvspectra.png" % (int(spw)), bbox_inches='tight')
+
+        pl.clf()
+        pl.plot(avgts_pol1)
+        pl.plot(avgts_pol2)
+        pl.xlabel("Time")
+        pl.ylabel("Amplitude")
+        pl.savefig(name+"_spw%i_timestream.png" % (int(spw)), bbox_inches='tight')
 
         # explicit cleanup
         pl.clf()
