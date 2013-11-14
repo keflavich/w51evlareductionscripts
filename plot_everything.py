@@ -158,7 +158,7 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
             print "Failed to select spw %s.  Skipping." % spw
             continue
 
-        print "Plotting spw %s" % spw
+        print "Loading spw %s..." % spw,
         d = ms.getdata(['amplitude','axis_info','uvdist'],ifraxis=True)
         sortorder = np.argsort(d['uvdist'][:,0])
         amp = d['amplitude'][:,:,sortorder,:]
@@ -169,6 +169,7 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         antavg_pol1 = amp[0,:,:,:].mean(axis=1)
         antavg_pol2 = amp[1,:,:,:].mean(axis=1)
 
+        print "Plotting spw %s..." % spw
         pl.clf()
         pl.title("Channel Average, Polarization 1, SPW %s" % spw)
         pl.imshow(chavg_pol1, aspect=chavg_pol1.shape[1]/float(chavg_pol1.shape[0]), norm=AsinhNorm(), interpolation='nearest')
