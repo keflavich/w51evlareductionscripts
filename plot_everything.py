@@ -137,6 +137,8 @@ def plot_everything(vis, ydatacolumn='data', async=False):
                 ))
 
 def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=''):
+    fig = pl.figure(figsize=(12,12))
+
     ms.open(vis)
     spwinfo = ms.getspectralwindowinfo()
 
@@ -144,21 +146,28 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
 
     print "Plotting amp vs time for spws: ",spws
 
-    fig = pl.figure(figsize=(12,12))
-
-    if not ms.selectinit(datadescid=0, reset=True):
-        ms.close()
-        raise ValueError("MS selection failed at init.")
-
+    print "Before!"
     for spw in spws:
+        print "Just print already!",spw,spws,
         if int(spw) in skipspw:
+            print "Skipping spw %s.  " % spw,
             continue
 
         print "Selecting %s..." % spw,
         if not ms.reset():
             ms.close()
             raise ValueError("MS selection failed to reset.")
-        if not ms.msselect({'spw':str(spw),'field':field}):
+        else:
+            print "Reset...",
+        if not ms.selectinit(datadescid=int(spw)):
+            ms.close()
+            raise ValueError("MS selection failed at init.")
+        else:
+            print "SelectInit...",
+        try:
+            ms.msselect({'spw':str(spw),'field':field})
+            print "Select...",
+        except RuntimeError:
             print "Failed to select spw %s.  Skipping." % spw
             continue
 
@@ -242,9 +251,13 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         pl.ylabel("Amplitude")
         pl.savefig(name+"_spw%i_timestream.png" % (int(spw)), bbox_inches='tight')
 
+        print "Done plotting spw %s; now cleaning up" % spw,
+
         # explicit cleanup
         pl.clf()
         del d,amp,antavg_pol1,antavg_pol2,timeavg_pol1,timeavg_pol2,chavg_pol1,chavg_pol2
+
+        print "Cleanup complete."
         
     # apparently we have to close each time... great.
     # (or just reset!)
