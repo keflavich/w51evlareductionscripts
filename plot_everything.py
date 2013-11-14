@@ -218,6 +218,10 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         pl.colorbar()
         pl.savefig(name+"_spw%i_antavg_pol2.png" % (int(spw)), bbox_inches='tight')
 
+        # explicit cleanup
+        pl.clf()
+        del d,amp,antavg_pol1,antavg_pol2,timeavg_pol1,timeavg_pol2,chavg_pol1,chavg_pol2
+        
     # apparently we have to close each time... great.
     # (or just reset!)
     ms.close()
