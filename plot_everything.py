@@ -150,6 +150,7 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         if int(spw) in skipspw:
             continue
 
+        ms.open(vis)
         print "Selecting %s..." % spw,
         if not ms.selectinit(datadescid=0):
             ms.close()
@@ -218,7 +219,8 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         pl.colorbar()
         pl.savefig(name+"_spw%i_antavg_pol2.png" % (int(spw)), bbox_inches='tight')
 
-    ms.close()
+        # apparently we have to close each time... great.
+        ms.close()
     pl.close(fig.number)
 
 
