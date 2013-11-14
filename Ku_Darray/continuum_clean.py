@@ -19,7 +19,7 @@ clean(vis=vis,
       multiscale=[0,5,10],
       outframe='LSRK',
       pbcor=T)
-exportfits('W51Ku_Darray_continuum_low.hires.clean.image','W51Ku_Darray_continuum_low.hires.clean.image.fits')
+exportfits('W51Ku_Darray_continuum_low.hires.clean.image','W51Ku_Darray_continuum_low.hires.clean.image.fits',overwrite=True)
 clean(vis=vis,
       field='W51 Ku',
       spw='12,13,14,16,17,18', # left out 10,20
@@ -33,4 +33,4 @@ clean(vis=vis,
       multiscale=[0,5,10],
       outframe='LSRK',
       pbcor=T)
-exportfits('W51Ku_Darray_continuum_high.hires.clean.image','W51Ku_Darray_continuum_high.hires.clean.image.fits')
+exportfits('W51Ku_Darray_continuum_high.hires.clean.image','W51Ku_Darray_continuum_high.hires.clean.image.fits',overwrite=True)
