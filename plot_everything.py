@@ -150,9 +150,8 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         if int(spw) in skipspw:
             continue
 
-        ms.open(vis)
         print "Selecting %s..." % spw,
-        if not ms.selectinit(datadescid=0):
+        if not ms.selectinit(datadescid=0, reset=True):
             ms.close()
             raise ValueError("MS selection failed.")
         if not ms.msselect({'spw':str(spw),'field':field}):
@@ -219,8 +218,9 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
         pl.colorbar()
         pl.savefig(name+"_spw%i_antavg_pol2.png" % (int(spw)), bbox_inches='tight')
 
-        # apparently we have to close each time... great.
-        ms.close()
+    # apparently we have to close each time... great.
+    # (or just reset!)
+    ms.close()
     pl.close(fig.number)
 
 
