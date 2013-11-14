@@ -146,14 +146,18 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
 
     fig = pl.figure(figsize=(12,12))
 
+    if not ms.selectinit(datadescid=0, reset=True):
+        ms.close()
+        raise ValueError("MS selection failed at init.")
+
     for spw in spws:
         if int(spw) in skipspw:
             continue
 
         print "Selecting %s..." % spw,
-        if not ms.selectinit(datadescid=0, reset=True):
+        if not ms.reset():
             ms.close()
-            raise ValueError("MS selection failed.")
+            raise ValueError("MS selection failed to reset.")
         if not ms.msselect({'spw':str(spw),'field':field}):
             print "Failed to select spw %s.  Skipping." % spw
             continue
@@ -171,8 +175,8 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
 
         avgspec_pol1 = timeavg_pol1.mean(axis=1)
         avgspec_pol2 = timeavg_pol2.mean(axis=1)
-        avgts_pol1 = chanavg_pol1.mean(axis=2)
-        avgts_pol2 = chanavg_pol2.mean(axis=2)
+        avgts_pol1 = chavg_pol1.mean(axis=1)
+        avgts_pol2 = chavg_pol2.mean(axis=1)
 
         print "Plotting spw %s..." % spw
         pl.clf()
