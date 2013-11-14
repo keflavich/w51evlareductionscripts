@@ -136,7 +136,7 @@ def plot_everything(vis, ydatacolumn='data', async=False):
                 highres=True,
                 ))
 
-def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12)):
+def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=''):
     ms.open(vis)
     spwinfo = ms.getspectralwindowinfo()
 
@@ -146,15 +146,15 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12)):
 
     fig = pl.figure(figsize=(12,12))
 
-    if not ms.selectinit(datadescid=0):
-        ms.close()
-        raise ValueError("MS selection failed.")
     for spw in spws:
         if int(spw) in skipspw:
             continue
 
         print "Selecting %s..." % spw,
-        if not ms.msselect({'spw':str(spw)}):
+        if not ms.selectinit(datadescid=0):
+            ms.close()
+            raise ValueError("MS selection failed.")
+        if not ms.msselect({'spw':str(spw),'field':field}):
             print "Failed to select spw %s.  Skipping." % spw
             continue
 
