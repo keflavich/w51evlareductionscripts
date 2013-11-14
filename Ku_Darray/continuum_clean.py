@@ -7,7 +7,8 @@ vis = '13A-064.sb18020284.eb19181492.56353.71736577546.ms'
 
 clean(vis=vis,
       field='W51 Ku',
-      spw='2,3,4,5,6,7', # left out 0,8
+      # apparently spw2 and spw4 are badly affected by RFI?
+      spw='3,5,6,7', # left out 0,8
       imagename='W51Ku_Darray_continuum_low.hires.clean',
       psfmode='hogbom',
       cell=['0.15 arcsec'],
