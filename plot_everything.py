@@ -146,7 +146,15 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
 
     print "Plotting amp vs time for spws: ",spws
 
-    print "Before!"
+    print "Before: simple test of a simple loop"
+    for spw in spws:
+        print "Successfully looped into spw ",spw,
+        if int(spw) in skipspw:
+            print "Will skip spw %s.  " % spw
+        else:
+            print
+        
+    print "Beginning the 'real' loop now: ",
     for spw in spws:
         print "Starting loop...",
         if int(spw) in skipspw:
