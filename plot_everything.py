@@ -139,6 +139,7 @@ def plot_everything(vis, ydatacolumn='data', async=False):
 def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=''):
     fig = pl.figure(figsize=(12,12))
 
+    print "Opening MS file ",vis
     ms.open(vis)
     spwinfo = ms.getspectralwindowinfo()
 
