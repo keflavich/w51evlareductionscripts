@@ -182,6 +182,11 @@ def plot_amp_vs_time(vis,name,overwrite=True,skipspw=[], figsize=(12,12), field=
 
         print "Loading spw %s..." % spw,
         d = ms.getdata(['amplitude','axis_info','uvdist'],ifraxis=True)
+
+        if any(np.isnan(d)):
+            print "WARNING: found NANs!"
+            d[np.isnan(d)] = 0
+
         sortorder = np.argsort(d['uvdist'][:,0])
         amp = d['amplitude'][:,:,sortorder,:]
         chavg_pol1 = amp[0,10:-10,:,:].mean(axis=0)

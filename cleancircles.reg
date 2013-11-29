@@ -1,0 +1,9 @@
+# Region file format: DS9 version 4.1
+global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+fk5
+circle(19:23:41.782,+14:31:02.48,2.06826")  # text={w51e6}
+circle(19:23:41.863,+14:30:56.54,1.54914")  # text={w51e5}
+circle(19:23:39.901,+14:31:09.01,9.15108")  # text={w51irs2}
+circle(19:23:43.893,+14:30:34.19,1.91983")  # text={w51e2}
+circle(19:23:43.805,+14:30:26.08,5.0239")   # text={w51e1}
+circle(19:23:42.095,+14:30:43.19,15.8281")  # text={w51ext}
