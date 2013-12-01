@@ -11,12 +11,22 @@ concat(vis=['W51Ku_Barray_continuum_split_noavg.ms',
             'W51Ku_Darray_continuum_split_noavg.ms'],
        concatvis='W51Ku_BDcontinuum_concat_FULL.ms')
 
-concat(vis=['../W51_Ku_B/13A-064.W51_Ku_Barray.spw11.split.ms',
-            '../W51_Ku_D/13A-064.W51_Ku_Darray.spw11.split.ms'],
-       concatvis='W51_Ku_BD_spw11_concat.ms')
 
-concat(vis=['../W51_Ku_B/13A-064.W51_Ku_Barray.spw19.split.ms',
-            '../W51_Ku_D/13A-064.W51_Ku_Darray.spw19.split.ms'],
-       concatvis='W51_Ku_BD_spw19_concat.ms')
+uvcontsub(vis=B_ms, fitspw='18,20', spw='19', fitorder=1, combine='spw')
+uvcontsub(vis=D_ms, fitspw='18,20', spw='19', fitorder=1, combine='spw')
+#uvcontsub(vis=B_ms, fitspw='10,12', spw='11', fitorder=1, combine='spw')
+#uvcontsub(vis=D_ms, fitspw='10,12', spw='11', fitorder=1, combine='spw')
 
+#concat(vis=['../W51_Ku_B/13A-064.W51_Ku_Barray.spw11.split.ms',
+#            '../W51_Ku_D/13A-064.W51_Ku_Darray.spw11.split.ms'],
+#       concatvis='W51_Ku_BD_spw11_concat.ms')
 
+concat(vis=[B_ms.replace(".ms",".ms.contsub"),
+            D_ms.replace(".ms",".ms.contsub")],
+       concatvis='W51_Ku_BD_spw19_contsub_concat.ms')
+
+B_ms = '../W51_Ku_B/13A-064.W51_Ku_Barray.spw19.split.ms'
+D_ms = '../W51_Ku_D/13A-064.W51_Ku_Darray.spw19.split.ms'
+concat(vis=[B_ms,
+            D_ms],
+       concatvis='W51_Ku_BD_spw19_concat2.ms')
