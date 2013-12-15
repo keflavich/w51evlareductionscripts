@@ -16,7 +16,9 @@ def myclean(spw, name,
             vis=vis,
             cell=['0.15 arcsec'],
             mode='mfs',
-            nterms=1):
+            modelimage='',
+            nterms=1,
+            **kwargs):
 
     imagename = 'W51Ku_BDarray_continuum_%s.hires.%s' % (name,dirtyclean)
 
@@ -35,9 +37,11 @@ def myclean(spw, name,
           nterms=nterms,
           multiscale=multiscale,
           outframe='LSRK',
+          modelimage=modelimage,
           pbcor=T if nterms == 1 else F,
           weighting=weighting,
-          usescratch=True)
+          usescratch=True,
+          **kwargs)
 
     print "Exporting image ",imagename+".image"
     if nterms == 1:
@@ -53,8 +57,9 @@ def myclean(spw, name,
 ##myclean(both,'both','dirty')
 #myclean(both,'both','clean')
 #myclean(both,'both','clean',nterms=2)
-myclean(low, '2048_low_uniform','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
-myclean(high,'2048_high_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
+myclean(low, '2048_both_uniform_GBTmodel','clean', modelimage='continuum_singledish_model.image', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
+#myclean(low, '2048_low_uniform','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
+#myclean(high,'2048_high_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
 myclean(both,'2048_both_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
 myclean(both,'channel_both','clean',mode='channel')
 myclean(both,'channel_both_uniform','clean',weighting='uniform',mode='channel')

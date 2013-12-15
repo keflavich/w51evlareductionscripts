@@ -30,3 +30,16 @@ D_ms = '../W51_Ku_D/13A-064.W51_Ku_Darray.spw19.split.ms'
 concat(vis=[B_ms,
             D_ms],
        concatvis='W51_Ku_BD_spw19_concat2.ms')
+
+B_ms = '../W51_Ku_B/W51_Ku_Barray_narrow_H2CO22_contsub_justspw19.ms'
+D_ms = '../W51_Ku_D/W51_Ku_Darray_narrow_H2CO22_contsub_justspw19.ms'
+concat(vis=[B_ms,
+            D_ms],
+       concatvis='W51_Ku_BD_spw19_contsub19_concat2.ms')
+
+B_ms = '../W51_Ku_B/W51_Ku_Barray_narrow_H2CO22_contsub_justspw19.cvel.ms'
+D_ms = '../W51_Ku_D/W51_Ku_Darray_narrow_H2CO22_contsub_justspw19.cvel.ms'
+concat(vis=[B_ms,
+            D_ms],
+       concatvis='W51_Ku_BD_spw19_contsub19_concat.cvel.ms')
+

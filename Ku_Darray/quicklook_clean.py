@@ -14,5 +14,5 @@ for ii in xrange(23):
             mode='channel', multiscale=[0,5,10], outframe='LSRK', pbcor=T)
     if os.path.exists('W51Ku_Darray_spw%02i.clean.image' % ii):
         exportfits('W51Ku_Darray_spw%02i.clean.image' % ii,
-                   'W51Ku_Darray_spw%02i.clean.image.fits' % ii)
+                   'W51Ku_Darray_spw%02i.clean.image.fits' % ii,dropdeg=True)
 
