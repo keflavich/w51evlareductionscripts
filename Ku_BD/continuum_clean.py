@@ -45,7 +45,7 @@ def myclean(spw, name,
 
     print "Exporting image ",imagename+".image"
     if nterms == 1:
-        exportfits(imagename+".image",imagename+'.image.fits',overwrite=True)
+        exportfits(imagename+".image",imagename+'.image.fits', overwrite=True, velocity=True, dropstokes=True, dropdeg=True)
     elif nterms == 2:
         exportfits(imagename+".image.tt0",imagename+'.image.tt0.fits',overwrite=True)
         exportfits(imagename+".image.tt1",imagename+'.image.tt1.fits',overwrite=True)

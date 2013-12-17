@@ -4,8 +4,9 @@
 vis = 'W51Ku_BDcontinuum_concat_FULL.ms'
 vis = '13A-064.sb21341436.eb23334759.56447.48227415509.ms'
 vis = 'continuum_spws.ms'
+vis = 'W51_Cband_Carray_continuum.ms'
 
-low,high = '0,1,2,3,4,5,6','7,8,9,10,11,12,13,14'
+high,low = '0,1,2,3,4,5,6,7','8,9,10,11,12,13,14,15'
 both = ",".join([low,high])
 niter = {'dirty':0, 'clean':50000}
 
