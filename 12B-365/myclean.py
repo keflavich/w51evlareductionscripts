@@ -1,0 +1,54 @@
+# the concat includes both C and S bands... oops.
+
+def myclean(imagename,
+            spw,
+            imsize=[4096,4096],
+            threshold='0.1 mJy',
+            niter=50000,
+            weighting='natural',
+            multiscale=[0,3,6,10,15],
+            removefirst=False,
+            cell='0.15 arcsec'):
+
+    print "Cleaning image ",imagename
+
+    if removefirst and imagename:
+        os.system('rm -rf %s.*' % imagename)
+
+    nterms=1
+
+    clean(vis='12B-365_W51_concat.ms',
+          imagename=imagename,
+          spw=spw,
+          mode='mfs',
+          imsize=imsize,
+          cell=cell,
+          outframe='LSRK',
+          usescratch=T,
+          threshold=threshold,
+          niter=niter,
+          psfmode='hogbom',
+          multiscale=multiscale,
+          weighting=weighting,
+          )
+
+    print "Exporting image ",imagename+".image"
+    if nterms == 1:
+        exportfits(imagename+".image",imagename+'.image.fits',overwrite=True,dropdeg=True)
+    elif nterms == 2:
+        exportfits(imagename+".image.tt0",imagename+'.image.tt0.fits',overwrite=True)
+        exportfits(imagename+".image.tt1",imagename+'.image.tt1.fits',overwrite=True)
+
+# some RFI?
+flagdata(vis='12B-365_W51_concat.ms',spw='16~32', uvrange='1630~8804', timerange='2012/12/24/20:43:00~2012/12/24/20:44:00', antenna='ea06,ea22')
+
+myclean(imagename='W51_12B-365_2to3GHz_continuum_uniform',spw='16,17,18,19,20,21,22,23', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
+myclean(imagename='W51_12B-365_3to4GHz_continuum_uniform',spw='24,25,26,27,28,29,30,31', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
+myclean(imagename='W51_12B-365_2to3GHz_continuum',spw='16,17,18,19,20,21,22,23', threshold='0.1 mJy',removefirst=True)
+myclean(imagename='W51_12B-365_3to4GHz_continuum',spw='24,25,26,27,28,29,30,31', threshold='0.1 mJy',removefirst=True)
+myclean(imagename='W51_12B-365_4.4to5.4GHz_continuum_uniform',spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
+myclean(imagename='W51_12B-365_5.4to6.4GHz_continuum_uniform',spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
+
+myclean(imagename='W51_12B-365_4.4to5.4GHz_continuum',spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',removefirst=True)
+myclean(imagename='W51_12B-365_5.4to6.4GHz_continuum',spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',removefirst=True)
+
