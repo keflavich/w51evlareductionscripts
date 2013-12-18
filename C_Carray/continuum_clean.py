@@ -13,7 +13,7 @@ niter = {'dirty':0, 'clean':50000}
 
 def myclean(spw, name,
             dirtyclean='dirty',
-            multiscale=[0,3,6,8,10,15,30], 
+            multiscale=[0,3,6,12,24,48],
             imsize=[1024,1024],
             weighting='natural',
             vis=vis,
@@ -49,6 +49,7 @@ def myclean(spw, name,
     print "Exporting image ",imagename+".image"
     if nterms == 1:
         exportfits(imagename+".image",imagename+'.image.fits',overwrite=True)
+        exportfits(imagename+".residual",imagename+'.residual.fits',overwrite=True)
     elif nterms == 2:
         exportfits(imagename+".image.tt0",imagename+'.image.tt0.fits',overwrite=True)
         exportfits(imagename+".image.tt1",imagename+'.image.tt1.fits',overwrite=True)
@@ -60,10 +61,15 @@ def myclean(spw, name,
 ##myclean(both,'both','dirty')
 #myclean(both,'both','clean')
 #myclean(both,'both','clean',nterms=2)
-myclean(low, '1024_both_uniform_AOmodel','clean', modelimage='W51-CBAND-continuum_singledish_model.image', weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
-myclean(low, '1024_low_uniform','clean', weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
-myclean(high,'1024_high_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
-myclean(both,'1024_both_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
+importfits('W51-CBAND-continuum_singledish_model.fits','W51-CBAND-continuum_singledish_model.image',overwrite=True)
+myclean(low, '1024_both_uniform_AOmodel','clean',
+        modelimage='W51-CBAND-continuum_singledish_model.image',
+        weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'],
+        multiscale=[0,3,6,12,24,48,96,192],
+        niter=int(1e5))
+myclean(low, '1024_low_uniform','clean', weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
+myclean(high,'1024_high_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
+myclean(both,'1024_both_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
 #myclean(both,'channel_both','clean',mode='channel')
 #myclean(both,'channel_both_uniform','clean',weighting='uniform',mode='channel')
 #myclean(both,'2048_channel_both_uniform','clean',weighting='uniform',mode='channel',imsize=[2048,2048],cell=['0.1 arcsec'])
