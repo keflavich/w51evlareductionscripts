@@ -8,6 +8,7 @@ def myclean(imagename,
             weighting='natural',
             multiscale=[0,3,6,10,15],
             removefirst=False,
+            vis='12B-365_W51_concat.ms',
             cell='0.15 arcsec'):
 
     print "Cleaning image ",imagename
@@ -17,7 +18,7 @@ def myclean(imagename,
 
     nterms=1
 
-    clean(vis='12B-365_W51_concat.ms',
+    clean(vis=vis,
           imagename=imagename,
           spw=spw,
           mode='mfs',
@@ -61,7 +62,19 @@ import os
 for msname in individual_obs:
     outname = os.path.splitext(os.path.split(msname)[1])[0]
 
-    myclean(imagename=outname+'_2to3GHz_continuum_uniform',spw='16,17,18,19,20,21,22,23', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
-    myclean(imagename=outname+'_3to4GHz_continuum_uniform',spw='24,25,26,27,28,29,30,31', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
-    myclean(imagename=outname+'_4.4to5.4GHz_continuum_uniform',spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
-    myclean(imagename=outname+'_5.4to6.4GHz_continuum_uniform',spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',weighting='uniform',cell='0.1 arcsec',multiscale=[0,3,6,10],removefirst=True)
+    myclean(vis=msname, imagename=outname+'_2to3GHz_continuum_uniform',
+            spw='16,17,18,19,20,21,22,23', threshold='0.5 mJy',
+            weighting='uniform', cell='0.1 arcsec', multiscale=[0,3,6,10],
+            removefirst=True)
+    myclean(vis=msname, imagename=outname+'_3to4GHz_continuum_uniform',
+            spw='24,25,26,27,28,29,30,31', threshold='0.5 mJy',
+            weighting='uniform', cell='0.1 arcsec', multiscale=[0,3,6,10],
+            removefirst=True)
+    myclean(vis=msname, imagename=outname+'_4.4to5.4GHz_continuum_uniform',
+            spw='0,1,2,3,4,5,6,7', threshold='0.5
+            mJy',weighting='uniform',cell='0.1
+            arcsec',multiscale=[0,3,6,10],removefirst=True)
+    myclean(vis=msname, imagename=outname+'_5.4to6.4GHz_continuum_uniform',
+            spw='8,9,10,11,12,13,14,15', threshold='0.5
+            mJy',weighting='uniform',cell='0.1
+            arcsec',multiscale=[0,3,6,10],removefirst=True)
