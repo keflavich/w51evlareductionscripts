@@ -51,6 +51,10 @@ integ1 = tau2[0:23,:,:].sum(axis=0)
 f2[0].data = integ1 + nanmask
 f2[0].writeto('H2CO_22_Ku_D_tausummed_52to58.fits',clobber=True)
 
+integ2 = tau2[23:38,:,:].sum(axis=0)
+f2[0].data = integ2 + nanmask
+f2[0].writeto('H2CO_22_Ku_D_tausummed_58to63.fits',clobber=True)
+
 integ2 = tau2[38:51,:,:].sum(axis=0)
 f2[0].data = integ2 + nanmask
 f2[0].writeto('H2CO_22_Ku_D_tausummed_63to67.fits',clobber=True)

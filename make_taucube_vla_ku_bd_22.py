@@ -2,6 +2,7 @@ from astropy.io import fits
 import numpy as np
 import astropy.units as u
 from agpy import cubes
+from FITS_tools import cube_regrid
 import agpy
 
 #f2 = fits.open('H2CO_22_speccube.fits')
@@ -28,9 +29,14 @@ contlev = cont_offset.value + extra_cont_offset + noisefloor
 spec2 = f2[0].data[190:293,:,:] + contlev + cont2
 # try to "subtract out" the negative continuum...
 #spec2[:,cont2<0] -= cont2[cont2<0]
-spec2s = cubes.smooth_cube(spec2,kernelwidth=1.5)
+dosmooth = False
+if dosmooth:
+    spec2s = cube_regrid.spatial_smooth_cube(spec2,kernelwidth=1.5)
 
-cont2s = agpy.smooth(cont2+contlev,kernelwidth=1.5)
+    cont2s = agpy.smooth(cont2+contlev,kernelwidth=1.5)
+else:
+    spec2s = spec2
+    cont2s = cont2
 spec2s[:,cont2s<0] -= cont2s[cont2s<0]
 #cont2s[cont2s<contlev]=contlev
 

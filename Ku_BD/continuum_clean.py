@@ -5,7 +5,7 @@ vis = 'W51Ku_BDcontinuum_concat_FULL.ms'
 
 low,high = '0,1,2,3,10,11','4,5,6,7,8,9'
 both = ",".join([low,high])
-niter = {'dirty':0, 'clean':50000}
+niter = {'dirty':0, 'clean':int(1e5)}
 
 
 def myclean(spw, name,
@@ -51,8 +51,10 @@ def myclean(spw, name,
         exportfits(imagename+".image.tt0",imagename+'.image.tt0.fits',overwrite=True)
         exportfits(imagename+".image.tt1",imagename+'.image.tt1.fits',overwrite=True)
 
+contmodel = 'W51-UBAND-continuum_singledish_model'
+importfits(contmodel+'.fits',contmodel+'.image',overwrite=True)
 myclean(both, '2048_both_uniform_GBTmodel', 'clean',
-        modelimage='continuum_singledish_model.image', weighting='uniform',
+        modelimage=contmodel+'.image', weighting='uniform',
         imsize=[2048,2048], cell=['0.1 arcsec'])
 #myclean(low, '2048_low_uniform','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
 #myclean(high,'2048_high_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])

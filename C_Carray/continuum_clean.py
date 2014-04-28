@@ -8,7 +8,7 @@ vis = 'W51_Cband_Carray_continuum.ms'
 
 high,low = '0,1,2,3,4,5,6,7','8,9,10,11,12,13,14,15'
 both = ",".join([low,high])
-niter = {'dirty':0, 'clean':50000}
+niter = {'dirty':0, 'clean':int(1e5)}
 
 
 def myclean(spw, name,
@@ -62,14 +62,19 @@ def myclean(spw, name,
 #myclean(both,'both','clean')
 #myclean(both,'both','clean',nterms=2)
 importfits('W51-CBAND-continuum_singledish_model.fits','W51-CBAND-continuum_singledish_model.image',overwrite=True)
-myclean(low, '1024_both_uniform_AOmodel','clean',
+myclean(low, '1024_low_uniform_AOmodel','clean',
         modelimage='W51-CBAND-continuum_singledish_model.image',
         weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'],
         multiscale=[0,3,6,12,24,48,96,192],
-        niter=int(1e5))
-myclean(low, '1024_low_uniform','clean', weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
-myclean(high,'1024_high_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
-myclean(both,'1024_both_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'], niter=int(1e5))
+        )
+myclean(low, '1024_low_uniform','clean', weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
+myclean(high,'1024_high_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
+myclean(both,'1024_both_uniform','clean',weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'])
+myclean(both, '1024_both_uniform_AOmodel','clean',
+        modelimage='W51-CBAND-continuum_singledish_model.image',
+        weighting='uniform',imsize=[1024,1024],cell=['0.3 arcsec'],
+        multiscale=[0,3,6,12,24,48,96,192],
+        )
 #myclean(both,'channel_both','clean',mode='channel')
 #myclean(both,'channel_both_uniform','clean',weighting='uniform',mode='channel')
 #myclean(both,'2048_channel_both_uniform','clean',weighting='uniform',mode='channel',imsize=[2048,2048],cell=['0.1 arcsec'])
