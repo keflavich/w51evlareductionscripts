@@ -57,14 +57,16 @@ if False:
 individual_obs = {'sband':'56270/12B-365.56270.W51.ms',
                   'cband':'56216/12B-365.56216.W51.ms',
                   'cband':'56248/12B-365.56248.W51.ms',
-                  'cband':'56255/12B-365.56255.W51.ms',
+                  # success 'cband':'56255/12B-365.56255.W51.ms',
                   'sband':'56285/12B-365.56285.W51.ms',
-                  'sband':'56243/12B-365.56243.W51.ms'}
+                  # success 'sband':'56243/12B-365.56243.W51.ms'
+                  }
 
 import os
 for band,msname in individual_obs.iteritems():
     outname = os.path.splitext(os.path.split(msname)[1])[0]
 
+    print "Reducing {0} -> {1}: {2}".format(msname, outname, band)
     if band == 'sband':
         myclean(vis=msname, imagename=outname+'_2to3GHz_continuum_uniform',
                 spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',
@@ -83,3 +85,7 @@ for band,msname in individual_obs.iteritems():
                 spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',
                 weighting='uniform', cell='0.1 arcsec', 
                 multiscale=[0,3,6,10],removefirst=True)
+
+    else:
+        for ii in range(5):
+            print "ERROR: band was ",band
