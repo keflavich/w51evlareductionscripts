@@ -64,7 +64,7 @@ individual_obs = [('sband','56270/12B-365.56270.W51.ms'),
                   ]
 
 import os
-for band,msname in individual_obs.iteritems():
+for band,msname in individual_obs:
     outname = os.path.splitext(os.path.split(msname)[1])[0]
 
     print "Reducing {0} -> {1}: {2}".format(msname, outname, band)
