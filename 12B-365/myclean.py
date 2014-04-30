@@ -14,6 +14,7 @@ def myclean(imagename,
     print "Cleaning image ",imagename
 
     if removefirst and imagename:
+        os.system('cp {0}.image.fits {0}.image_backup.fits'.format(imagename))
         os.system('rm -rf %s.*' % imagename)
 
     nterms=1
@@ -54,13 +55,13 @@ if False:
     myclean(imagename='W51_12B-365_4.4to5.4GHz_continuum',spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',removefirst=True)
     myclean(imagename='W51_12B-365_5.4to6.4GHz_continuum',spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',removefirst=True)
 
-individual_obs = {'sband':'56270/12B-365.56270.W51.ms',
-                  'cband':'56216/12B-365.56216.W51.ms',
-                  'cband':'56248/12B-365.56248.W51.ms',
-                  # success 'cband':'56255/12B-365.56255.W51.ms',
-                  'sband':'56285/12B-365.56285.W51.ms',
-                  # success 'sband':'56243/12B-365.56243.W51.ms'
-                  }
+individual_obs = [('sband','56270/12B-365.56270.W51.ms'),
+                  ('cband','56216/12B-365.56216.W51.ms'),
+                  #('cband','56248/12B-365.56248.W51.ms'),
+                  #('cband','56255/12B-365.56255.W51.ms'),
+                  #('sband','56285/12B-365.56285.W51.ms'),
+                  #('sband','56243/12B-365.56243.W51.ms'),
+                  ]
 
 import os
 for band,msname in individual_obs.iteritems():
