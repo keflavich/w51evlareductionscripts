@@ -10,7 +10,7 @@ niter = {'dirty':0, 'clean':int(1e5)}
 
 def myclean(spw, name,
             dirtyclean='dirty',
-            multiscale=[0,3,6,12,24], 
+            multiscale=[0,3,6,12,24],
             imsize=[1024,1024],
             weighting='natural',
             vis=vis,
@@ -26,7 +26,7 @@ def myclean(spw, name,
 
     clean(vis=vis,
           field='W51 Ku',
-          spw=spw, 
+          spw=spw,
           imagename=imagename,
           psfmode='hogbom',
           cell=cell,
@@ -51,11 +51,11 @@ def myclean(spw, name,
         exportfits(imagename+".image.tt0",imagename+'.image.tt0.fits',overwrite=True)
         exportfits(imagename+".image.tt1",imagename+'.image.tt1.fits',overwrite=True)
 
-contmodel = 'W51-UBAND-continuum_singledish_model'
-importfits(contmodel+'.fits',contmodel+'.image',overwrite=True)
-myclean(both, '2048_both_uniform_GBTmodel', 'clean',
-        modelimage=contmodel+'.image', weighting='uniform',
-        imsize=[2048,2048], cell=['0.1 arcsec'])
+#contmodel = 'W51-UBAND-continuum_singledish_model'
+#importfits(contmodel+'.fits',contmodel+'.image',overwrite=True)
+#myclean(both, '2048_both_uniform_GBTmodel', 'clean',
+#        modelimage=contmodel+'.image', weighting='uniform',
+#        imsize=[2048,2048], cell=['0.1 arcsec'])
 #myclean(low, '2048_low_uniform','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
 #myclean(high,'2048_high_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
 #myclean(both,'2048_both_uniform','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'])
@@ -63,3 +63,9 @@ myclean(both, '2048_both_uniform_GBTmodel', 'clean',
 #myclean(both,'channel_both_uniform','clean',weighting='uniform',mode='channel')
 #myclean(both,'2048_channel_both_uniform','clean',weighting='uniform',mode='channel',imsize=[2048,2048],cell=['0.1 arcsec'])
 #myclean(both,'4096_both_uniform','clean',weighting='uniform',imsize=[4096,4096],cell=['0.075 arcsec'])
+
+# 4/30/2014: use Baobab's single-dish UV data
+myclean(vis=['W51Ku_BDcontinuum_concat_FULL.ms','VLAGBT.Ku.uvaver.uv.ms'],
+        name="singledish_baobab_1024uniform",
+        dirtyclean='clean',
+        weighting='uniform')

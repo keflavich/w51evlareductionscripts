@@ -83,7 +83,7 @@ for band,msname in individual_obs.iteritems():
                 multiscale=[0,3,6,10],removefirst=True)
         myclean(vis=msname, imagename=outname+'_5.4to6.4GHz_continuum_uniform',
                 spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',
-                weighting='uniform', cell='0.1 arcsec', 
+                weighting='uniform', cell='0.1 arcsec',
                 multiscale=[0,3,6,10],removefirst=True)
 
     else:
