@@ -65,7 +65,8 @@ def myclean(spw, name,
 #myclean(both,'4096_both_uniform','clean',weighting='uniform',imsize=[4096,4096],cell=['0.075 arcsec'])
 
 # 4/30/2014: use Baobab's single-dish UV data
-myclean(vis=['W51Ku_BDcontinuum_concat_FULL.ms','VLAGBT.Ku.uvaver.uv.ms'],
+myclean(spw=both,
         name="singledish_baobab_1024uniform",
+        vis=['W51Ku_BDcontinuum_concat_FULL.ms','VLAGBT.Ku.uvaver.uv.ms'],
         dirtyclean='clean',
         weighting='uniform')
