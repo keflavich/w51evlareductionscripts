@@ -8,6 +8,7 @@ def myclean(imagename,
             weighting='natural',
             multiscale=[0,3,6,10,15],
             removefirst=False,
+            mask=None,
             vis='12B-365_W51_concat.ms',
             cell='0.15 arcsec'):
 
@@ -29,6 +30,7 @@ def myclean(imagename,
           usescratch=T,
           threshold=threshold,
           niter=niter,
+          mask=mask,
           psfmode='hogbom',
           multiscale=multiscale,
           weighting=weighting,
@@ -56,10 +58,10 @@ if False:
     myclean(imagename='W51_12B-365_5.4to6.4GHz_continuum',spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',removefirst=True)
 
 individual_obs = [('sband','56270/12B-365.56270.W51.ms'),
-                  ('cband','56216/12B-365.56216.W51.ms'),
+                  #('cband','56216/12B-365.56216.W51.ms'),
                   #('cband','56248/12B-365.56248.W51.ms'),
                   #('cband','56255/12B-365.56255.W51.ms'),
-                  #('sband','56285/12B-365.56285.W51.ms'),
+                  ('sband','56285/12B-365.56285.W51.ms'),
                   #('sband','56243/12B-365.56243.W51.ms'),
                   ]
 
@@ -70,11 +72,11 @@ for band,msname in individual_obs:
     print "Reducing {0} -> {1}: {2}".format(msname, outname, band)
     if band == 'sband':
         myclean(vis=msname, imagename=outname+'_2to3GHz_continuum_uniform',
-                spw='0,1,2,3,4,5,6,7', threshold='0.5 mJy',
+                spw='0,1,2,3,4,5,6,7', threshold='1 mJy',
                 weighting='uniform', cell='0.1 arcsec', multiscale=[0,3,6,10],
                 removefirst=True)
         myclean(vis=msname, imagename=outname+'_3to4GHz_continuum_uniform',
-                spw='8,9,10,11,12,13,14,15', threshold='0.5 mJy',
+                spw='8,9,10,11,12,13,14,15', threshold='1 mJy',
                 weighting='uniform', cell='0.1 arcsec', multiscale=[0,3,6,10],
                 removefirst=True)
     elif band == 'cband':
