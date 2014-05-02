@@ -79,3 +79,16 @@ myclean(spw=both,
         dirtyclean='veryclean',
         multiscale=[0,3,6,12,24,48,96,192],
         weighting='uniform')
+
+# 5/2/2014: for comparison between downsampled and undownsampled data
+myclean(spw=both, name='2048_both_uniform_uvdownsampled', dirtyclean='clean',
+        weighting='uniform', imsize=[2048, 2048], cell=['0.1 arcsec'],
+        vis=['W51Ku_BDcontinuum_concat.ms'])
+
+
+# 5/2/2014: per Baobab's recommendation, image each SPW.  Maybe that will show
+# why the resids are bad, and maybe open the door to self-cal on a per-spw
+# basis
+for spw in range(12):
+    myclean(str(spw),'2048_spw%i_uniform' % spw,'clean',
+            weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'])
