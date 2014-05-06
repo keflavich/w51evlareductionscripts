@@ -45,5 +45,6 @@ def myclean(spw, name,
     exportfits(imagename+".residual",imagename+'.residual.fits',overwrite=True)
 
 myclean('7', 'ch3oh','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
+myclean('15', 'h111a','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
 myclean('19','h2co11','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
 

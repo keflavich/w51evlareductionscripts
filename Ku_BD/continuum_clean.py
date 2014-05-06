@@ -5,7 +5,7 @@ vis = 'W51Ku_BDcontinuum_concat_FULL.ms'
 
 low,high = '0,1,2,3,10,11','4,5,6,7,8,9'
 both = ",".join([low,high])
-niter = {'dirty':0, 'clean':int(1e5), 'veryclean':int(1e10)}
+niter = {'dirty':0, 'clean':int(1e5), 'veryclean':int(1e6)}
 
 
 def myclean(spw, name,
@@ -19,6 +19,7 @@ def myclean(spw, name,
             mode='mfs',
             modelimage='',
             nterms=1,
+            threshold='0.01 mJy',
             **kwargs):
 
     imagename = 'W51Ku_BDarray_continuum_%s.hires.%s' % (name,dirtyclean)
@@ -33,7 +34,7 @@ def myclean(spw, name,
           cell=cell,
           imsize=imsize,
           niter=niter[dirtyclean],
-          threshold='0.01 mJy',
+          threshold=threshold,
           mode=mode,
           nterms=nterms,
           multiscale=multiscale,
@@ -72,16 +73,18 @@ def myclean(spw, name,
 #        field='',
 #        dirtyclean='clean',
 #        weighting='uniform')
-myclean(spw=both,
-        name="singledish_baobab_2048uniform",
-        vis=['W51Ku_BDcontinuum_concat_FULL.ms','VLAGBT.Ku.uvaver.uv.ms'],
-        field='',
-        dirtyclean='veryclean',
-        multiscale=[0,3,6,12,24,48,96,192],
-        weighting='uniform')
+# 5/6/2014: failed miserably!  terrible streaks everywhere
+#myclean(spw=both,
+#        name="singledish_baobab_2048uniform",
+#        vis=['W51Ku_BDcontinuum_concat_FULL.ms','VLAGBT.Ku.uvaver.uv.ms'],
+#        field='',
+#        dirtyclean='veryclean',
+#        multiscale=[0,3,6,12,24,48,96,192],
+#        weighting='uniform')
 
 # 5/2/2014: for comparison between downsampled and undownsampled data
-myclean(spw=both, name='2048_both_uniform_uvdownsampled', dirtyclean='clean',
+# 5/6/2014: go to veryclean (but this was never done in the first place)
+myclean(spw=both, name='2048_both_uniform_uvdownsampled', dirtyclean='veryclean',
         weighting='uniform', imsize=[2048, 2048], cell=['0.1 arcsec'],
         vis=['W51Ku_BDcontinuum_concat.ms'])
 
@@ -89,6 +92,7 @@ myclean(spw=both, name='2048_both_uniform_uvdownsampled', dirtyclean='clean',
 # 5/2/2014: per Baobab's recommendation, image each SPW.  Maybe that will show
 # why the resids are bad, and maybe open the door to self-cal on a per-spw
 # basis
+# 5/6/2014: go to veryclean
 for spw in range(12):
-    myclean(str(spw),'2048_spw%i_uniform' % spw,'clean',
+    myclean(str(spw),'2048_spw%i_uniform' % spw,'veryclean',
             weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'])

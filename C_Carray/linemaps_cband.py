@@ -1,3 +1,25 @@
+#  0      EVLA_C#A0C0#0     128   TOPO    5860.000      1000.000    128000.0      12  RR  LL
+#  1      EVLA_C#A0C0#1     128   TOPO    5988.000      1000.000    128000.0      12  RR  LL
+#  2      EVLA_C#A0C0#2     128   TOPO    6116.000      1000.000    128000.0      12  RR  LL
+#  3      EVLA_C#A0C0#3     128   TOPO    6244.000      1000.000    128000.0      12  RR  LL
+#  4      EVLA_C#A0C0#4     128   TOPO    6372.000      1000.000    128000.0      12  RR  LL
+#  5      EVLA_C#A0C0#5     128   TOPO    6500.000      1000.000    128000.0      12  RR  LL
+#  6      EVLA_C#A0C0#6     128   TOPO    6628.000      1000.000    128000.0      12  RR  LL
+#  7      EVLA_C#A0C0#7    1024   TOPO    6663.367         7.812      8000.0      12  RR  LL  CH3OH
+#  8      EVLA_C#A0C0#8     128   TOPO    6756.000      1000.000    128000.0      12  RR  LL
+#  9      EVLA_C#B0D0#9     128   TOPO    4248.000      1000.000    128000.0      15  RR  LL
+#  10     EVLA_C#B0D0#10    128   TOPO    4376.000      1000.000    128000.0      15  RR  LL
+#  11     EVLA_C#B0D0#11    512   TOPO    4388.000         7.812      4000.0      15  RR  LL H213CO
+#  12     EVLA_C#B0D0#12    128   TOPO    4504.000      1000.000    128000.0      15  RR  LL
+#  13     EVLA_C#B0D0#13    512   TOPO    4590.330         7.812      4000.0      15  RR  LL H112a (?)
+#  14     EVLA_C#B0D0#14    128   TOPO    4632.000      1000.000    128000.0      15  RR  LL
+#  15     EVLA_C#B0D0#15    512   TOPO    4739.395        15.625      8000.0      15  RR  LL H111a
+#  16     EVLA_C#B0D0#16    128   TOPO    4760.000      1000.000    128000.0      15  RR  LL
+#  17     EVLA_C#B0D0#17   1024   TOPO    4824.861         7.812      8000.0      15  RR  LL H2CO
+#  18     EVLA_C#B0D0#18    128   TOPO    4888.000      1000.000    128000.0      15  RR  LL
+#  19     EVLA_C#B0D0#19    512   TOPO    5000.000         7.812      4000.0      15  RR  LL H109a
+#  20     EVLA_C#B0D0#20    128   TOPO    5016.000      1000.000    128000.0      15  RR  LL
+#  21     EVLA_C#B0D0#21    128   TOPO    5144.000      1000.000    128000.0      15  RR  LL
 # vis = '13A-064.sb21341436.eb23334759.56447.48227415509.ms'
 # imagename = 'H2CO_11_speccube'
 # clean(vis=vis,imagename=imagename,field='W51 Ku', mode='velocity', 
