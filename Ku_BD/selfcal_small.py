@@ -4,6 +4,11 @@ Revisiting 5/6/2014
 INTERACTIVE=False
 outdir='pngs/'
 
+def rm_images(imagename):
+    for suffix in ['.image','.model','.psf','.flux','.residual']:
+        if os.path.exists(imagename+suffix):
+            shutil.rmtree(imagename+suffix)
+
 vis = 'W51Ku_BDcontinuum_concat.ms'
 caltable = 'W51Ku_BDcontinuum_concat_SMALL_gaincal.pcal'
 aptable = 'W51Ku_BDcontinuum_concat_SMALL_apcal.pcal'
@@ -11,6 +16,7 @@ aptable = 'W51Ku_BDcontinuum_concat_SMALL_apcal.pcal'
 delmod(vis=vis,scr=True)
 
 imagename = 'W51Ku_BD_big_uniform_cont_concat_SMALL_selfcal_SHALLOW.clean'
+rm_images(imagename)
 clean(vis=vis,
       field='W51 Ku',
       spw='',
@@ -69,6 +75,7 @@ applycal(vis=vis,
                                                                                                       
 
 imagename = 'W51Ku_BD_big_uniform_cont_concat_SMALL_selfcal.clean'
+rm_images(imagename)
 clean(vis=vis,
       field='W51 Ku',
       spw='',
