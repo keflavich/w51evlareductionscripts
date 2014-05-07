@@ -502,7 +502,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
           mask=cleanboxes, weighting=weighting, robust=robust, niter=10000,
-          psfmode=psfmode, imsize=imsize, cell=cell nterms=1, usescratch=True)
+          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1, usescratch=True)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
     plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',
