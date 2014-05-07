@@ -18,7 +18,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
             avgchannel_narrow='8', cleanboxes="", refant='ea27', solint='30s',
             niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
             cell='0.1arcsec', weighting='uniform', robust=0.0,
-            psfmode='clark'):
+            psfmode='clark', openviewer=False):
     """
     Docstring incomplete
     """
@@ -142,10 +142,11 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
                 mask=cleanboxes,
                 nterms=1,
                 usescratch=True)
-        viewer(imagename+".image",
-                outfile=outdir+imagename+".image.png",
-                outformat='png',
-                gui=False)
+        if openviewer:
+            viewer(imagename+".image",
+                    outfile=outdir+imagename+".image.png",
+                    outformat='png',
+                    gui=False)
         exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
     imrms = [imstat(imagename+".image",box=statsbox)['rms']]
@@ -177,10 +178,11 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
                     usescratch=True)
             exportfits(imagename=first_image+".image", fitsimage=first_image+".fits", overwrite=True)
 
-        viewer(first_image+".image",
-                outfile=outdir+first_image+".image.png",
-                outformat='png',
-                gui=False)
+        if openviewer:
+            viewer(first_image+".image",
+                    outfile=outdir+first_image+".image.png",
+                    outformat='png',
+                    gui=False)
 
         # this fails?
         #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
@@ -470,10 +472,11 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
 
         imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
 
-        viewer(selfcal_image+".image",
-                outfile=outdir+selfcal_image+".image.png",
-                outformat='png',
-                gui=False)
+        if openviewer:
+            viewer(selfcal_image+".image",
+                    outfile=outdir+selfcal_image+".image.png",
+                    outformat='png',
+                    gui=False)
 
         print "FINISHED ITERATION %i" % calnum
 
@@ -599,4 +602,3 @@ def apply_selfcal(rawvis, field, spwn_source, spwn_target, calnum=0):
             multiscale=[0,5,10,25], psfmode='hogbom',
             weighting='briggs', robust=0.5, niter=10000, imsize=512)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
-
