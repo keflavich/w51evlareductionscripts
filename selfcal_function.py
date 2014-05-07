@@ -137,7 +137,7 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
 
         clean(vis=avg_data, field=field, imagename=imagename, mode='mfs',
                 psfmode=psfmode, multiscale=multiscale,
-                weighting=weighting, briggs=briggs, niter=100, imsize=imsize,
+                weighting=weighting, robust=robust, niter=100, imsize=imsize,
                 cell=cell,
                 mask=cleanboxes,
                 nterms=1,
