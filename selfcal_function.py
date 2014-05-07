@@ -11,11 +11,14 @@ mytb = casac.table()
 clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 
 
-def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W51 Ku',
-        outdir_template="spw%i_selfcal_iter/", statsbox='170,50,229,97', ant1list=['ea14','ea05'],
-        ant2list=['ea16','ea07'], avgchannel_wide='128', avgchannel_narrow='8',
-        cleanboxes="", refant='ea27', solint='30s', niter=2,
-        multiscale=[0,5,10,15,25,50], imsize=512, ):
+def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
+            field='W51 Ku', outdir_template="spw%i_selfcal_iter/",
+            statsbox='170,50,229,97', ant1list=['ea14','ea05'],
+            ant2list=['ea16','ea07'], avgchannel_wide='128',
+            avgchannel_narrow='8', cleanboxes="", refant='ea27', solint='30s',
+            niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
+            cell='0.1arcsec', weighting='uniform', robust=0.0,
+            psfmode='clark'):
     """
     Docstring incomplete
     """
@@ -132,9 +135,10 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+imagename+suffix)
 
-        clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
-                psfmode='hogbom',multiscale=multiscale,
-                weighting='briggs', robust=0.0, niter=100, imsize=imsize,
+        clean(vis=avg_data, field=field, imagename=imagename, mode='mfs',
+                psfmode=psfmode, multiscale=multiscale,
+                weighting=weighting, briggs=briggs, niter=100, imsize=imsize,
+                cell=cell,
                 mask=cleanboxes,
                 nterms=1,
                 usescratch=True)
@@ -425,9 +429,10 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
             selfcal_image = 'spw%i_ku_d_selfcal%i' % (spwn,calnum)
             for suffix in clean_output_suffixes:
                 os.system("rm -rf "+selfcal_image+suffix)
-            clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
-                    psfmode='hogbom',multiscale=multiscale,
-                    weighting='briggs', robust=0.5, niter=1000, imsize=imsize,
+            clean(vis=avg_data, imagename=selfcal_image, field=field, mode='mfs',
+                    psfmode=psfmode, multiscale=multiscale,
+                    weighting=weighting, robust=robust, niter=1000, imsize=imsize,
+                    cell=cell,
                     nterms=1,
                     mask=cleanboxes,
                     usescratch=True)
@@ -495,10 +500,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     selfcal_image = 'spw%i_ku_d_selfcal%i_final' % (spwn,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
-    clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', mask=cleanboxes,
-            weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
-            nterms=1,
-            usescratch=True)
+    clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
+          mask=cleanboxes, weighting=weighting, robust=robust, niter=10000,
+          psfmode=psfmode, imsize=imsize, cell=cell nterms=1, usescratch=True)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
     plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',
@@ -534,11 +538,9 @@ def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True, field='W
     selfcal_image = 'spw%i_ku_d_selfcal%i_final_multiscale' % (spwn,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
-    clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs', imagermode='csclean',# mask=cleanboxes,
-            multiscale=multiscale, psfmode='hogbom',
-            nterms=1,
-            weighting='briggs', robust=0.5, niter=10000, imsize=imsize,
-            usescratch=True)
+    clean(vis=avg_data,imagename=selfcal_image,field=field, mode='mfs',
+          psfmode=psfmode, nterms=1, weighting=weighting, robust=robust,
+          niter=10000, imsize=imsize, cell=cell, usescratch=True)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
 
     plotms(vis=avg_data, spw='0', xaxis='baseline', yaxis='amp', avgtime='1e8',

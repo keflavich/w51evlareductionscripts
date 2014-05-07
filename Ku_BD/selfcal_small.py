@@ -92,6 +92,6 @@ clean(vis=vis,
       restfreq='14.488479GHz',
       pbcor=T,
       usescratch=T)
-exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", velocity=True, dropstokes=True, dropdeg=True)
-exportfits(imagename=imagename+".residual", fitsimage=imagename+".residual.fits", velocity=True, dropstokes=True, dropdeg=True)
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", velocity=True, dropstokes=True, dropdeg=True, overwrite=True)
+exportfits(imagename=imagename+".residual", fitsimage=imagename+".residual.fits", velocity=True, dropstokes=True, dropdeg=True, overwrite=True)
 
