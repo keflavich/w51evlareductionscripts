@@ -3,7 +3,7 @@
 """
 vis = '13A-064.sb28612538.eb29114303.56766.55576449074.ms'
 
-niter = {'dirty':0, 'clean':int(1e5)}
+niter = {'dirty':0, 'clean':int(1e5), 'littleclean': int(1e3)}
 
 def myclean(spw, name,
             dirtyclean='dirty',
@@ -15,9 +15,10 @@ def myclean(spw, name,
             mode='mfs',
             modelimage='',
             threshold='0.01 mJy',
+            width=None,
             **kwargs):
 
-    imagename = 'W51Ku_C_Aarray_continuum_%s.%s' % (name,dirtyclean)
+    imagename = 'W51Ku_C_Aarray_%s_%s' % (name,dirtyclean)
 
     print "Cleaning image ",imagename
 
@@ -31,6 +32,7 @@ def myclean(spw, name,
           niter=niter[dirtyclean],
           threshold=threshold,
           mode=mode,
+          width=width,
           nterms=1,
           multiscale=multiscale,
           outframe='LSRK',
@@ -45,6 +47,10 @@ def myclean(spw, name,
     exportfits(imagename+".residual",imagename+'.residual.fits',overwrite=True)
 
 myclean('7', 'ch3oh','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
-myclean('15', 'h111a','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
+myclean('7', 'ch3oh_wide','littleclean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy',width=8)
+myclean('7', 'ch3oh_1024_wide','littleclean', weighting='uniform',imsize=[1024,1024],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy',width=8)
+myclean('15', 'h111a_wide','clean', weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy',width=8)
 myclean('19','h2co11','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy')
+myclean('19','h2co11_wide','clean',weighting='uniform',imsize=[2048,2048],cell=['0.1 arcsec'],mode='channel', threshold='1 mJy',width=8)
 
+myclean('7', 'ch3oh_2048_narrow','littleclean', weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'], mode='channel', threshold='1 mJy', width=1, nchan=130, start=68*8)
