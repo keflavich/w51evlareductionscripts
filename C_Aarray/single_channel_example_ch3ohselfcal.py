@@ -2,7 +2,7 @@
 Test script run on May 13 2014
 """
 outputvis = 'ch3oh_selfcal_test'
-if not os.path.exists(vis):
+if not os.path.exists(outputvis):
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
           spw='7:632', field='W51 Ku',
           timerange='2014/04/19/13:38:11~2014/04/19/14:38:11',
