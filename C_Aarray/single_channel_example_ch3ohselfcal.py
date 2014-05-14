@@ -4,8 +4,8 @@ Test script run on May 13 2014
 outputvis = 'ch3oh_selfcal_test'
 if not os.path.exists(outputvis):
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
-          spw='7:632', field='W51 Ku',
-          timerange='2014/04/19/13:38:11~2014/04/19/14:38:11',
+          spw='7:632', field='',
+          timerange='2014/04/19/13:30:11~2014/04/19/14:38:11',
           keepflags=True)
 
 
@@ -31,7 +31,7 @@ for ii in range(20):
     caltable = 'ch3oh_selfcal_phase{0:d}'.format(ii)
     os.system('rm -r {0}'.format(caltable))
     gaincal(vis=vis,
-            field='',
+            field='W51 Ku',
             caltable=caltable,
             spw='',
             # gaintype = 'T' could reduce failed fit errors by averaging pols...
@@ -63,7 +63,7 @@ ii += 1
 vis='ch3oh_selfcal_test'
 caltable = 'ch3oh_selfcal_ampphase'
 gaincal(vis=vis,
-        field='',
+        field='W51 Ku',
         caltable=caltable,
         spw='',
         # gaintype = 'T' could reduce failed fit errors by averaging pols...
