@@ -5,7 +5,7 @@ outputvis = 'ch3oh_selfcal_test'
 if not os.path.exists(outputvis):
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
           spw='7:632', field='',
-          timerange='2014/04/19/13:30:11~2014/04/19/14:38:11',
+          timerange='2014/04/19/13:30:11~2014/04/19/14:45:00',
           keepflags=True)
 
 
