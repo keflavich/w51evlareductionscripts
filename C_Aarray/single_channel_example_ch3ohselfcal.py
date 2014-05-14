@@ -28,7 +28,7 @@ os.system('rm -rf ch3oh_2048_chan632.*')
 # First SHALLOW clean to establish a model
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632',
       field='W51 Ku',
-      weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
       mode='mfs', threshold='500 mJy', niter=100,
       selectdata=True)
 exportfits('ch3oh_2048_chan632.image','ch3oh_2048_chan632.image.fits')
@@ -70,7 +70,7 @@ for ii in range(20):
 
     clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal{0:02d}'.format(ii),
           field='W51 Ku',
-          weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+          weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
           mode='mfs', threshold='500 mJy', niter=100,
           selectdata=True)
     exportfits('ch3oh_2048_chan632_selfcal{0:02d}.image'.format(ii),
@@ -121,7 +121,7 @@ applycal(vis=vis,
 os.system('rm -rf ch3oh_2048_chan632_selfcal{0:02d}.*'.format(ii))
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal{0:02d}'.format(ii),
       field='W51 Ku',
-      weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
       mode='mfs', threshold='500 mJy', niter=100,
       selectdata=True)
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}.image'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}.image.fits'.format(ii))
@@ -129,7 +129,7 @@ exportfits('ch3oh_2048_chan632_selfcal{0:02d}.model'.format(ii),'ch3oh_2048_chan
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}.residual'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}.residual.fits'.format(ii))
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal{0:02d}_deep'.format(ii),
       field='W51 Ku',
-      weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
       mode='mfs', threshold='20 mJy', niter=10000,
       selectdata=True)
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}_deep.image'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}_deep.image.fits'.format(ii))
@@ -161,7 +161,7 @@ clearcal(vis=vis)
 os.system('rm -rf ch3oh_2048_chan631.*')
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan631',
       field='W51 Ku',
-      weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
       mode='mfs', threshold='100 mJy', niter=500,
       selectdata=True)
 exportfits('ch3oh_2048_chan631.image','ch3oh_2048_chan631.image.fits')
@@ -174,7 +174,7 @@ delmod(vis=vis)
 os.system('rm -rf ch3oh_2048_chan631_crosscal*')
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan631_crosscal',
       field='W51 Ku',
-      weighting='uniform', imsize=[2048,2048], cell=['0.1 arcsec'],
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
       mode='mfs', threshold='20 mJy', niter=10000,
       selectdata=True)
 exportfits('ch3oh_2048_chan631_crosscal.image','ch3oh_2048_chan631_crosscal.image.fits')
