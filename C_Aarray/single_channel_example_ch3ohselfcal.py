@@ -3,11 +3,11 @@ Test script run on May 13 2014
 """
 outputvis = 'ch3oh_selfcal_test'
 if not os.path.exists(outputvis):
-    vis = '13A-064.sb28612538.eb29114303.56766.55576449074.ms'
+    vis = '../13A-064.sb28612538.eb29114303.56766.55576449074.ms'
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
-          spw='7:632', field='',
+          spw='7:632', field='')
           #timerange='2014/04/19/13:30:11~2014/04/19/14:45:00',
-          keepflags=True)
+          #keepflags=True)
 
 
 # first model, I guess
@@ -41,7 +41,7 @@ solint = '30s'
 
 #delmod(vis=vis)
 #setjy(vis=vis, model='ch3oh_1024_chan632.image')
-for ii in range(20):
+for ii in range(10): # 10 is enough.  5 is probably enough.  3 might even be.
 
     caltable = 'ch3oh_selfcal_phase{0:02d}'.format(ii)
     os.system('rm -r {0}'.format(caltable))
@@ -100,6 +100,7 @@ phasecaltable = 'ch3oh_selfcal_phase{0:02d}'.format(ii)
 ii += 1
 vis='ch3oh_selfcal_test'
 caltable = 'ch3oh_selfcal_ampphase'
+os.system('rm -r {0}'.format(caltable))
 gaincal(vis=vis,
         field='W51 Ku',
         caltable=caltable,
@@ -111,7 +112,8 @@ gaincal(vis=vis,
         calmode='a',
         combine='scan',
         minsnr=3,
-        minblperant=4)
+        minblperant=4,
+        gaintable=[phasecaltable])
 #plotcal(caltable, yaxis='phase', xaxis='amp')
 # Miller said to apply both
 applycal(vis=vis,
@@ -127,6 +129,30 @@ clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal{0:02d}'.format(ii)
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}.image'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}.image.fits'.format(ii))
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}.model'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}.model.fits'.format(ii))
 exportfits('ch3oh_2048_chan632_selfcal{0:02d}.residual'.format(ii),'ch3oh_2048_chan632_selfcal{0:02d}.residual.fits'.format(ii))
+
+# try blcal
+blcaltable = 'ch3oh_selfcal_blcal'
+os.system('rm -r {0}'.format(blcaltable))
+blcal(vis=vis, caltable=blcaltable, field='W51 Ku', spw='', solint='inf',
+      calmode='ap', gaintable=[caltable, phasecaltable],
+      interp='linear')
+applycal(vis=vis,
+         gaintable=[phasecaltable,caltable,blcaltable],
+         interp='linear',
+         flagbackup=True) # was False when flagmanager was used
+
+os.system('rm -rf ch3oh_2048_chan632_selfcal_blcal{0:02d}.*'.format(ii))
+clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal_blcal{0:02d}'.format(ii),
+      field='W51 Ku',
+      weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
+      mode='mfs', threshold='500 mJy', niter=100,
+      selectdata=True)
+exportfits('ch3oh_2048_chan632_selfcal_blcal{0:02d}.image'.format(ii),'ch3oh_2048_chan632_selfcal_blcal{0:02d}.image.fits'.format(ii))
+exportfits('ch3oh_2048_chan632_selfcal_blcal{0:02d}.model'.format(ii),'ch3oh_2048_chan632_selfcal_blcal{0:02d}.model.fits'.format(ii))
+exportfits('ch3oh_2048_chan632_selfcal_blcal{0:02d}.residual'.format(ii),'ch3oh_2048_chan632_selfcal_blcal{0:02d}.residual.fits'.format(ii))
+
+
+os.system('rm -rf ch3oh_2048_chan632_selfcal{0:02d}_deep.*'.format(ii))
 clean(vis=vis, spw='0', imagename='ch3oh_2048_chan632_selfcal{0:02d}_deep'.format(ii),
       field='W51 Ku',
       weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'],
@@ -146,11 +172,11 @@ plotms(vis=vis, xaxis='uvdist', yaxis='amp', coloraxis='baseline', ydatacolumn='
 # See if we can apply our solution:
 outputvis = 'ch3oh_selfcal_test_application'
 if not os.path.exists(outputvis):
-    vis = '13A-064.sb28612538.eb29114303.56766.55576449074.ms'
+    vis = '../13A-064.sb28612538.eb29114303.56766.55576449074.ms'
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
-          spw='7:631', field='',
+          spw='7:631', field='')
           #timerange='2014/04/19/13:30:11~2014/04/19/14:45:00',
-          keepflags=True)
+          #keepflags=True)
 
 vis = outputvis
 flagdata(vis=vis, field='W51 Ku', spw='0', mode='unflag')
@@ -167,7 +193,7 @@ clean(vis=vis, spw='0', imagename='ch3oh_2048_chan631',
 exportfits('ch3oh_2048_chan631.image','ch3oh_2048_chan631.image.fits')
 
 applycal(vis=vis,
-         gaintable=[phasecaltable,caltable],
+         gaintable=[phasecaltable,caltable,blcaltable],
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 delmod(vis=vis)

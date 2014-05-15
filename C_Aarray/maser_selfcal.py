@@ -1,11 +1,11 @@
 
-flagdata(vis=vis, field='W51 Ku', spw='7', mode='unflag')
 outputvis = 'CH3OH_ch550to700_pipeline_split.ms'
 if not os.path.exists(outputvis):
     vis = '13A-064.sb28612538.eb29114303.56766.55576449074.ms'
+    #flagdata(vis=vis, field='W51 Ku', spw='7', mode='unflag')
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
-          spw='7:550~700', field='',
-          keepflags=True)
+          spw='7:550~700', field='')
+          #keepflags=True)
 
 vis = outputvis
 flagdata(vis=vis, field='W51 Ku', spw='0', mode='unflag')
