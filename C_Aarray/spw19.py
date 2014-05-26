@@ -1,7 +1,7 @@
 """
 May 16, 2014: creation
 
-This is not spw19!!
+This is not h109a!!
   19     EVLA_C#B0D0#19    512   TOPO    5000.000         7.812      4000.0      15  RR  LL
 """
 # Split the spw19 window and its corresponding continuum out
