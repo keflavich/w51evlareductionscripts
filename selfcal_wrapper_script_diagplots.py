@@ -11,7 +11,7 @@ mytb = casac.table()
 clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 
 
-def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
+def selfcal(vis, spwn=6, doplots=True, INTERACTIVE=False, reclean=True,
             field='W51 Ku', outdir_template="spw%i_selfcal_iter/",
             statsbox='170,50,229,97', ant1list=['ea14','ea05'],
             ant2list=['ea16','ea07'], avgchannel_wide='128',
@@ -24,43 +24,171 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
     Docstring incomplete
     """
 
+    spw = int(spwn)
+    outdir = outdir_template % spwn
+    try:
+        os.mkdir(outdir)
+    except OSError:
+        pass
+
+    # you're supposed to pass in avg_data as input
+    avg_data = vis
+
+    # plot each antenna's ampl vs time for flagging purposes
+    for ant2 in ant2list:
+        for ant in ant1list:
+            plotms(vis=vis, spw=str(spwn), xaxis='time', yaxis='amp', avgchannel=avgchannel_wide,
+                    avgscan=F, coloraxis='baseline', iteraxis='', xselfscale=T,
+                    yselfscale=T,
+                    antenna=ant+"&"+ant2,
+                    title='Amp vs Time before averaging for spw %i ant %s-%s' % (spwn,ant,ant2),
+                    plotfile=outdir+'ampvstime_spw%i_ant%s-%s.png' % (spwn,ant,ant2),
+                    field=field,
+                    overwrite=True,
+                    )
+
+            plotms(vis=vis, spw=str(spwn), xaxis='freq', yaxis='phase', avgtime='1e8',
+                    avgscan=T, coloraxis='corr', iteraxis='baseline', xselfscale=T,
+                    yselfscale=T,
+                    antenna=ant+"&"+ant2,
+                    title='Phase vs Freq with time averaging for spw %i ant %s-%s' % (spwn,ant,ant2),
+                    plotfile=outdir+'phasevsfreq_spw%i_ant%s-%s.png' % (spwn,ant,ant2),
+                    field=field,
+                    overwrite=True,
+                    )
+
+            plotms(vis=vis, spw=str(spwn), xaxis='amp', yaxis='phase', avgtime='1e8',
+                    avgscan=T, coloraxis='corr', iteraxis='baseline', xselfscale=T,
+                    yselfscale=T,
+                    antenna=ant+"&"+ant2,
+                    title='Phase vs Amp with time averaging for spw %i ant %s-%s' % (spwn,ant,ant2),
+                    plotfile=outdir+'phasevsamp_spw%i_ant%s-%s.png' % (spwn,ant,ant2),
+                    field=field,
+                    overwrite=True,
+                    )
+
+    # imagename = "noaverage_spw%i" % spwn
+    # os.system("rm -rf "+imagename+".image")
+    # os.system("rm -rf "+imagename+".model")
+    # os.system("rm -rf "+imagename+".flux")
+    # os.system("rm -rf "+imagename+".psf")
+    # os.system("rm -rf "+imagename+".residual")
+    # clean(vis=vis, field=field, imagename=imagename, mode='mfs', 
+    #         weighting='briggs', robust=0.5, niter=500, imsize=512)
+    # viewer(imagename+".image",
+    #         outfile=outdir+imagename+".image.png",
+    #         outformat='png',
+    #         gui=False)
+    # exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+
+
+    #width = 10 # for TW Hydra
+    # width = 4 # for NGC 3256
+
+
+    # (0) Using your split-off, calibrated data, plot the "model" in this MS using
+    # plotms.  It should be unit-valued for all data.  If not, run delmod to get
+    # rid of any model that might still be lurking in the header, and/or clearcal
+    # to set to 1 any MODEL data.
+    plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
+            avgchannel=avgchannel_wide, xdatacolumn='model', ydatacolumn='model', avgscan=F,
+            coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+            title='Model Amp vs Time after split for spw %i.  Should be all 1s' % spwn,
+            plotfile=outdir+'ampvstime_model_shouldbe1.png', field=field,
+            overwrite=True,)
+    delmod(vis=avg_data)
+
+    plotms(vis=avg_data, spw='0', xaxis='phase', yaxis='amp',
+            avgchannel=avgchannel_wide, xdatacolumn='data', ydatacolumn='data', avgscan=F,
+            coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+            title='Corrected Phase vs Amp after split',
+            plotfile=outdir+'ampvsphase_corrected_avg_spw%i.png' % spwn, field=field,
+            overwrite=True,)
+
+    # (0.5) Run clean non-interactively with some set number of iterations, and be
+    # sure to keep the image around for comparison later.  Run delmod to get rid of
+    # the model it saved to the MS header.
+    #if reclean:
+    #    imagename="average_spw%i_shallowclean" % spwn
+
+    #    for suffix in clean_output_suffixes:
+    #        os.system("rm -rf "+imagename+suffix)
+
+    #    clean(vis=avg_data, field=field, imagename=imagename, mode='mfs', 
+    #            weighting='briggs', robust=0.5, niter=100, imsize=512)
+    #    viewer(imagename+".image",
+    #            outfile=outdir+imagename+".image.png",
+    #            outformat='png',
+    #            gui=False)
+    #    exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+    #    delmod(avg_data,scr=True)
+
 
     # (1) Clean a single SPW *interactively*, boxing the brightest regions and not
     # cleaning very deeply (maybe 100 iterations).  Keep this model in the header
     # -- it's what you'll use for the first round of self-calibration.
     if reclean:
-        imagename="average_spw%i_shallowclean_masked" % spw
+        imagename="average_spw%i_shallowclean_masked" % spwn
 
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+imagename+suffix)
 
         clean(vis=avg_data, field=field, imagename=imagename, mode='mfs',
-              psfmode=psfmode, multiscale=multiscale,
-              weighting=weighting, robust=robust, niter=100, imsize=imsize,
-              cell=cell,
-              mask=cleanboxes,
-              nterms=1,
-              interactive=INTERACTIVE,
-              usescratch=True)
+                psfmode=psfmode, multiscale=multiscale,
+                weighting=weighting, robust=robust, niter=100, imsize=imsize,
+                cell=cell,
+                mask=cleanboxes,
+                nterms=1,
+                usescratch=True)
+        if openviewer:
+            viewer(imagename+".image",
+                    outfile=outdir+imagename+".image.png",
+                    outformat='png',
+                    gui=False)
         exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
     imrms = [imstat(imagename+".image",box=statsbox)['rms']]
 
+    # FAILS!!!!
+    #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
+    #        avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
+    #        coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+    #        title='Model Amp vs Time after shallow clean for spw %i.' % spwn,
+    #        plotfile=outdir+'ampvstime_model_shallowclean_spw%i.png' % spwn, field=field,
+    #        overwrite=True,)
+
+
     for calnum in xrange(niter):
+
+        # for Ku D W51 Ku spw 2
         if reclean:
 
-            first_image = '{0}_{1}_firstim_selfcal{2}'.format(field, spw, calnum).replace(" ","_")
+            first_image = 'spw%i_ku_d_firstim_selfcal%i' % (spwn,calnum)
 
             for suffix in clean_output_suffixes:
                 os.system("rm -rf "+first_image+suffix)
 
-            clean(vis=avg_data,imagename=first_image,field=field, mode='mfs',
-                  psfmode='hogbom', multiscale=multiscale,
-                  weighting='briggs', robust=0.0, niter=100, imsize=imsize,
-                  mask=cleanboxes,
-                  nterms=1,
-                  usescratch=True)
+            clean(vis=avg_data,imagename=first_image,field=field, mode='mfs', 
+                    psfmode='hogbom',multiscale=multiscale,
+                    weighting='briggs', robust=0.0, niter=100, imsize=imsize,
+                    mask=cleanboxes,
+                    nterms=1,
+                    usescratch=True)
             exportfits(imagename=first_image+".image", fitsimage=first_image+".fits", overwrite=True)
+
+        if openviewer:
+            viewer(first_image+".image",
+                    outfile=outdir+first_image+".image.png",
+                    outformat='png',
+                    gui=False)
+
+        # this fails?
+        #plotms(vis=avg_data, spw='0', xaxis='time', yaxis='amp',
+        #    avgchannel='128', xdatacolumn='model', ydatacolumn='model', avgscan=F,
+        #    coloraxis='baseline', iteraxis='', xselfscale=T, yselfscale=T,
+        #    title='Model Amp vs Time after shallow clean for spw %i iter %i.' % (spwn,calnum),
+        #    plotfile=outdir+'ampvstime_model_shallowclean_spw%i_iter%i.png' % (spwn,calnum), field=field,
+        #    overwrite=True,)
 
         # DONE avg/split ing
 
@@ -80,14 +208,18 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
                     minsnr=minsnr,
                     minblperant=4)
 
+        #
         # Watch out for failed solutions noted in the terminal during this
         # solution. If you see a large fraction (really more than 1 or 2) of
         # your antennas failing to converge in many time intervals then you
         # may need to lengthen the solution interval.
+        #
 
         # =%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
         # INSPECT THE CALIBRATION
         # =%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
+
+        #
         # After you have run the gaincal, you want to inspect the
         # solution. Use PLOTCAL to look at the solution (here broken into
         # panels by SPW with individual antennas mapped to colors). Look at
@@ -339,6 +471,11 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
 
         imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
 
+        if openviewer:
+            viewer(selfcal_image+".image",
+                    outfile=outdir+selfcal_image+".image.png",
+                    outformat='png',
+                    gui=False)
 
         print "FINISHED ITERATION %i" % calnum
 
