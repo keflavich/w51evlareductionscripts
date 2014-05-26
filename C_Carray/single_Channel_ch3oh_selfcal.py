@@ -3,7 +3,7 @@ Test script copied from A-array on May 26 2014
 """
 outputvis = 'ch3oh_selfcal_test'
 if not os.path.exists(outputvis):
-    vis = '../13A-064.sb21341436.eb23334759.56447.48227415509.ms'
+    vis = '13A-064.sb21341436.eb23334759.56447.48227415509.ms'
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
           spw='7:632', field='')
           #timerange='2014/04/19/13:30:11~2014/04/19/14:45:00',
