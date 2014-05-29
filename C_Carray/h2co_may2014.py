@@ -5,10 +5,12 @@ outvis = 'W51_Cband_Carray_H2CO.ms'
 split(vis=vis, outputvis=outvis, spw='17:250~600',
       datacolumn='corrected', field='W51 Ku', width=4)
 
+listobs(outvis)
 uvcontsub(outvis)
+listobs(outvis+".contsub")
 
 imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform'
-clean(vis=outvis,
+clean(vis=outvis+".contsub",
       imagename=imagename,field='W51 Ku', 
       mode='velocity', 
       weighting='uniform', niter=50000, spw='0', cell=['1.0 arcsec'],
