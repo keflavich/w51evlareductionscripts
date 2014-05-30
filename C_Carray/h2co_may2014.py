@@ -9,7 +9,15 @@ listobs(outvis)
 uvcontsub(outvis)
 listobs(outvis+".contsub")
 
-imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform'
+phasecaltable = '../continuum/cont_spw2_selfcal_phase02'
+#ampcaltable = '../ch3oh/ch3oh_selfcal_ampphase'
+blcaltable = '../continuum/cont_spw2_selfcal_blcal'
+applycal(vis=outvis+".contsub",
+         gaintable=[phasecaltable,blcaltable],
+         interp='linear',
+         flagbackup=True) # was False when flagmanager was used
+
+imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform_selfcal'
 clean(vis=outvis+".contsub",
       imagename=imagename,field='W51 Ku', 
       mode='velocity', 

@@ -75,9 +75,9 @@ if False:
                   spw=spw, field='', width=16)
         vis = outputvis
 
-        phasecaltable = '../ch3oh/ch3oh_selfcal_phase09'
-        ampcaltable = '../ch3oh/ch3oh_selfcal_ampphase'
-        blcaltable = '../ch3oh/ch3oh_selfcal_blcal'
+        phasecaltable = '../continuum/cont_spw2_selfcal_phase02'
+        #ampcaltable = '../ch3oh/ch3oh_selfcal_ampphase'
+        blcaltable = '../continuum/cont_spw2_selfcal_blcal'
 
         flagdata(vis=vis, field='W51 Ku', spw='0', mode='unflag')
         #flagdata(vis=vis, mode='manual', antenna='ea18') # don't know if it was bad in this spw
@@ -97,7 +97,7 @@ if False:
         exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
 
         applycal(vis=vis,
-                 gaintable=[phasecaltable,ampcaltable,blcaltable],
+                 gaintable=[phasecaltable,blcaltable],
                  interp='linear',
                  flagbackup=True) # was False when flagmanager was used
         delmod(vis=vis)
