@@ -18,14 +18,17 @@ applycal(vis=outvis+".contsub",
          flagbackup=True) # was False when flagmanager was used
 
 imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform_selfcal'
+os.system('rm -rf {0}.*'.format(imagename))
 clean(vis=outvis+".contsub",
       imagename=imagename,field='W51 Ku', 
-      mode='velocity', 
+      mode='channel', 
       weighting='uniform', niter=50000, spw='0', cell=['1.0 arcsec'],
       imsize=[1024,1024],
       outframe='LSRK',
       multiscale=[0,3,6,12,24],
       usescratch=T,
-      threshold='0.1 mJy',
+      threshold='3.0 mJy',
+      chaniter=True,
       restfreq='4.82966GHz')
-exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
