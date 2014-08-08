@@ -13,7 +13,8 @@ regions = pyregion.open('/Users/adam/work/w51/w51_apertures.reg')
 
 t0 = time.time()
 
-for fn in ('H77a_BDarray_speccube_uniform_contsub_cvel_big2.fits','W51Ku_BD_spw19.bigish_uniform_contsub19.cvel.clean.image.fits'):
+for fn in ('H77a_BDarray_speccube_uniform_contsub_cvel_big2.fits',
+           'W51Ku_BD_spw19.bigish_uniform_contsub19.cvel.clean.image.fits'):
 
     print "dt=%g" % (time.time()-t0), fn
     C = pyspeckit.Cube(fn)
