@@ -26,6 +26,8 @@ for s in sp:
     s.plotter.savefig(s.specname+"_h77a_fit.pdf",bbox_inches='tight')
 
 tbl = table.Table()
+names = table.Column(data=[sp.specname for sp in spectra], name='ObjectName')
+tbl.add_column(names)
 for ii,(parname,unit) in enumerate([('amplitude',u.mJy/u.beam),
                              ('velocity',u.km/u.s),
                              ('width',u.km/u.s)]):
