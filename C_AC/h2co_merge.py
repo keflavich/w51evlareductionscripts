@@ -44,6 +44,24 @@ applycal(vis=vis_C,
 uvcontsub(vis_C)
 uvcontsub(vis_A)
 
+
+imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_selfcal_dirty'
+os.system('rm -rf {0}.*'.format(imagename))
+clean(vis=[vis_A+".contsub",vis_C+".contsub"],
+      imagename=imagename, field='W51 Ku', 
+      mode='channel', 
+      weighting='uniform', niter=0, spw='0', cell=['0.1 arcsec'],
+      imsize=[1024,1024],
+      outframe='LSRK',
+      multiscale=[0,3,6,12,24],
+      usescratch=T,
+      threshold='1.0 mJy',
+      chaniter=True,
+      restfreq='4.82966GHz')
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
+
 imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_selfcal'
 os.system('rm -rf {0}.*'.format(imagename))
 clean(vis=[vis_A+".contsub",vis_C+".contsub"],

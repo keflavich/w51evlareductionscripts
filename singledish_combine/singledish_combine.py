@@ -1,12 +1,15 @@
 import image_registration
 from image_registration.fft_tools.zoom import zoom_on_pixel
 from FITS_tools.cube_regrid import regrid_fits_cube,regrid_cube_hdu
+from FITS_tools.hcongrid import hcongrid,hcongrid_hdu
+import FITS_tools
 import fft_psd_tools
 import spectral_cube.io.fits
 from astropy import wcs
 from astropy.io import fits
 from astropy import coordinates
 from astropy import units as u
+from astropy import log
 from astropy.utils.console import ProgressBar
 from itertools import izip
 import numpy as np
@@ -18,7 +21,8 @@ def combine_cband():
 
 def fourier_combine_cubes(cube1, cube2, highresextnum=0,
                           highresscalefactor=1.0,
-                          lowresscalefactor=1.0, lowresfwhm=1*u.arcmin):
+                          lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
+                          return_regridded_cube2=False):
     """
     Fourier combine two data cubes
 
@@ -38,6 +42,8 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
         The full-width-half-max of the single-dish (low-resolution) beam;
         or the scale at which you want to try to match the low/high resolution
         data
+    return_regridded_cube2 : bool
+        Return the 2nd cube regridded into the pixel space of the first?
     """
     #cube1 = spectral_cube.io.fits.load_fits_cube(highresfitsfile,
     #                                             hdu=highresextnum)
@@ -82,10 +88,13 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
 
         pb.update(ii+1)
 
-    return outcube
+    if return_regridded_cube2:
+        return outcube, f2
+    else:
+        return outcube
 
 def fourier_combine(highresfitsfile, lowresfitsfile,
-                    matching_scale=60*u.arcsec):
+                    matching_scale=60*u.arcsec, scale=False):
     """
     Simple reimplementation of 'feather'
     """
@@ -109,9 +118,11 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     galcenter = coordinates.SkyCoord(*(center*u.deg), frame='icrs').galactic
 
     im1 = f1[0].data.squeeze()
+    im1[np.isnan(im1)] = 0
     shape = im1.shape
     im2raw = f2[0].data.squeeze()
-    if len(shape) != im2raw.ndims:
+    im2raw[np.isnan(im2raw)] = 0
+    if len(shape) != im2raw.ndim:
         raise ValueError("Different # of dimensions in the interferometer and "
                          "single-dish images")
     if len(shape) == 3:
@@ -131,9 +142,12 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
 
     xax_as = (pixscale1/xax*u.deg).to(u.arcsec)
 
-    closest_point = np.argmin(np.abs(xax_as-matching_scale))
+    if scale:
+        closest_point = np.argmin(np.abs(xax_as-matching_scale))
 
-    scale_2to1 = (psd1[closest_point] / psd2[closest_point])**0.5
+        scale_2to1 = (psd1[closest_point] / psd2[closest_point])**0.5
+    else:
+        scale_2to1 = 1
 
     fft1 = np.fft.fft2(im1)
     fft2 = np.fft.fft2(im2) * scale_2to1
@@ -151,5 +165,75 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     return combo
 
 
+def feather_simple(hires, lores,
+                   highresextnum=0,
+                   lowresextnum=0,
+                   highresscalefactor=1.0,
+                   lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
+                   return_regridded_lores=False):
+    """
+    Fourier combine two data cubes
 
+    Parameters
+    ----------
+    highresfitsfile : str
+        The high-resolution FITS file
+    lowresfitsfile : str
+        The low-resolution (single-dish) FITS file
+    highresextnum : int
+        The extension number to use from the high-res FITS file
+    highresscalefactor : float
+    lowresscalefactor : float
+        A factor to multiply the high- or low-resolution data by to match the
+        low- or high-resolution data
+    lowresfwhm : `astropy.units.Quantity`
+        The full-width-half-max of the single-dish (low-resolution) beam;
+        or the scale at which you want to try to match the low/high resolution
+        data
+    return_regridded_cube2 : bool
+        Return the 2nd cube regridded into the pixel space of the first?
+    """
+    if not isinstance(hires, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu1 = fits.open(hires)[highresextnum]
+    if not isinstance(lores, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu2 = fits.open(lores)[lowresextnum]
+    im1 = hdu1.data.squeeze()
+    hd1 = FITS_tools.strip_headers.flatten_header(hdu1.header)
+    assert hd1['NAXIS'] == im1.ndim == 2
+    pixscale = FITS_tools.header_tools.header_to_platescale(hd1)
+    log.debug('pixscale = {0}'.format(pixscale))
 
+    #im2raw = hdu2.data.squeeze()
+    #hd2 = FITS_tools.strip_headers.flatten_header(hdu2.header)
+    #assert hd2['NAXIS'] == im2.ndim == 2
+    #w2 = cube2.wcs
+    #pixscale = FITS_tools.header_tools.header_to_platescale(hd2)
+
+    hdu2 = hcongrid_hdu(hdu2, hd1)
+    im2 = hdu2.data.squeeze()
+
+    nax1,nax2 = (hd1['NAXIS1'],
+                 hd1['NAXIS2'],
+                )
+
+    ygrid,xgrid = (np.indices([nax2,nax1])-np.array([(nax2-1.)/2,(nax1-1.)/2.])[:,None,None])
+    fwhm = np.sqrt(8*np.log(2))
+    # sigma in pixels
+    sigma = ((lowresfwhm/fwhm/(pixscale*u.deg)).decompose().value)
+    log.debug('sigma = {0}'.format(sigma))
+
+    kernel = np.fft.fftshift( np.exp(-(xgrid**2+ygrid**2)/(2*sigma**2)) )
+    kernel/=kernel.max()
+    ikernel = 1-kernel
+
+    fft1 = np.fft.fft2(np.nan_to_num(im1*highresscalefactor))
+    fft2 = np.fft.fft2(np.nan_to_num(im2*lowresscalefactor))
+
+    fftsum = kernel*fft2 + ikernel*fft1
+
+    combo = np.fft.ifft2(fftsum)
+
+    if return_regridded_lores:
+        return combo, hdu2
+    else:
+        return combo
