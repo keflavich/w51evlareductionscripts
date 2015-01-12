@@ -1,8 +1,8 @@
 vis = '../13A-064.sb21341436.eb23334759.56447.48227415509.ms'
-outvis = 'W51_Cband_Carray_H2CO.ms'
+outvis = 'W51_Cband_Carray_H2CO_channels388to398.ms'
 
-# width=4 added on May 29, 2014 (existing versions probably do not have this)
-split(vis=vis, outputvis=outvis, spw='17:250~600',
+# Cut out the channels with the most signal (and corresponding problems)
+split(vis=vis, outputvis=outvis, spw='17:388~398',
       datacolumn='corrected', field='W51 Ku', width=4)
 
 listobs(outvis)
@@ -17,12 +17,12 @@ applycal(vis=outvis+".contsub",
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 
-imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform_selfcal'
+imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform_selfcal_ch388to398_dirty'
 os.system('rm -rf {0}.*'.format(imagename))
 clean(vis=outvis+".contsub",
-      imagename=imagename,field='W51 Ku', 
+      imagename=imagename, field='W51 Ku', 
       mode='channel', 
-      weighting='uniform', niter=50000, spw='0', cell=['1.0 arcsec'],
+      weighting='uniform', niter=0, spw='0', cell=['1.0 arcsec'],
       imsize=[1024,1024],
       outframe='LSRK',
       multiscale=[0,3,6,12,24],
@@ -32,3 +32,4 @@ clean(vis=outvis+".contsub",
       restfreq='4.82966GHz')
 exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
 exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
