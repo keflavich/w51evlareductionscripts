@@ -44,6 +44,8 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
         The full-width-half-max of the single-dish (low-resolution) beam;
         or the scale at which you want to try to match the low/high resolution
         data
+    return_hdu : bool
+        Return an HDU instead of just a cube
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
