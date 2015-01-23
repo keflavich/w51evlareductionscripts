@@ -124,7 +124,13 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     center = w1.sub([wcs.WCSSUB_CELESTIAL]).wcs_pix2world([nax1/2.],
                                                           [nax2/2.],
                                                           1)
-    galcenter = coordinates.SkyCoord(*(center*u.deg), frame='icrs').galactic
+    frame = 'icrs' if w1.celestial.wcs.ctype[0][:2] == 'RA' else 'galactic'
+    if w2.celestial.wcs.ctype[0][:2] == 'RA':
+        center = coordinates.SkyCoord(*(center*u.deg), frame=frame).fk5
+        cxy = center.ra.deg,center.dec.deg
+    elif w2.celestial.wcs.ctype[0][:4] == 'GLON':
+        center = coordinates.SkyCoord(*(center*u.deg), frame=frame).galactic
+        cxy = center.l.deg,center.b.deg
 
     im1 = f1[0].data.squeeze()
     im1[np.isnan(im1)] = 0
@@ -138,11 +144,13 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
         if shape[0] != im2raw.shape[0]:
             raise ValueError("Spectral dimensions of cubes do not match.")
 
+    center_pixel = w2.sub([wcs.WCSSUB_CELESTIAL]).wcs_world2pix(cxy[0], cxy[1],
+                                                                0)[::-1]
+
     zoomed = zoom_on_pixel(np.nan_to_num(im2raw),
-                           w2.sub([wcs.WCSSUB_CELESTIAL]).wcs_world2pix(galcenter.l.deg,
-                                                                        galcenter.b.deg,
-                                                                        0)[::-1],
-                           usfac=pixscale2/pixscale1, outshape=shape)
+                           center_pixel,
+                           usfac=np.abs(pixscale2/pixscale1),
+                           outshape=shape)
 
     im2 = zoomed
 
@@ -163,7 +171,7 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
 
     xgrid,ygrid = (np.indices(shape)-np.array([(shape[0]-1.)/2,(shape[1]-1.)/2.])[:,None,None])
     
-    sigma = (shape[0]/((matching_scale/(pixscale1*u.deg)).decompose().value)) / np.sqrt(8*np.log(2))
+    sigma = np.abs(shape[0]/((matching_scale/(pixscale1*u.deg)).decompose().value)) / np.sqrt(8*np.log(2))
     kernel = np.fft.fftshift( np.exp(-(xgrid**2+ygrid**2)/(2*sigma**2)) )
     kernel/=kernel.max()
 
@@ -210,9 +218,13 @@ def feather_simple(hires, lores,
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
-    if not isinstance(hires, (fits.ImageHDU, fits.PrimaryHDU)):
+    if isinstance(hires, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu1 = hires
+    else:
         hdu1 = fits.open(hires)[highresextnum]
-    if not isinstance(lores, (fits.ImageHDU, fits.PrimaryHDU)):
+    if isinstance(lores, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu2 = lores
+    else:
         hdu2 = fits.open(lores)[lowresextnum]
     im1 = hdu1.data.squeeze()
     hd1 = FITS_tools.strip_headers.flatten_header(hdu1.header)
@@ -220,11 +232,10 @@ def feather_simple(hires, lores,
     pixscale = FITS_tools.header_tools.header_to_platescale(hd1)
     log.debug('pixscale = {0}'.format(pixscale))
 
-    #im2raw = hdu2.data.squeeze()
-    #hd2 = FITS_tools.strip_headers.flatten_header(hdu2.header)
-    #assert hd2['NAXIS'] == im2.ndim == 2
-    #w2 = cube2.wcs
-    #pixscale = FITS_tools.header_tools.header_to_platescale(hd2)
+    im2raw = hdu2.data.squeeze()
+    hd2 = FITS_tools.strip_headers.flatten_header(hdu2.header)
+    assert hd2['NAXIS'] == im2raw.ndim == 2
+    hdu2 = fits.PrimaryHDU(data=im2raw, header=hd2)
 
     hdu2 = hcongrid_hdu(hdu2, hd1)
     im2 = hdu2.data.squeeze()
