@@ -45,7 +45,8 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
         or the scale at which you want to try to match the low/high resolution
         data
     return_hdu : bool
-        Return an HDU instead of just a cube
+        Return an HDU instead of just a cube.  It will contain two image
+        planes, one for the real and one for the imaginary data.
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
@@ -173,7 +174,9 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     if not return_hdu:
         return combo
     elif return_hdu:
-        combo_hdu = fits.PrimaryHDU(data=combo, header=w1.to_header())
+        hdu1 = fits.ImageHDU(data=combo.real, header=w1.to_header())
+        hdu2 = fits.ImageHDU(data=combo.imag, header=w1.to_header())
+        combo_hdu = fits.HDUList([hdu1,hdu2])
         return combo_hdu
 
 
@@ -204,7 +207,8 @@ def feather_simple(hires, lores,
         or the scale at which you want to try to match the low/high resolution
         data
     return_hdu : bool
-        Return an HDU instead of just an image
+        Return an HDU instead of just an image.  It will contain two image
+        planes, one for the real and one for the imaginary data.
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
@@ -251,7 +255,8 @@ def feather_simple(hires, lores,
     if return_regridded_lores:
         return combo, hdu2
     elif return_hdu:
-        combo_hdu = fits.PrimaryHDU(data=combo, header=hdu1.header)
-        return combo_hdu
+        hdu1 = fits.ImageHDU(data=combo.real, header=hdu1.header)
+        hdu2 = fits.ImageHDU(data=combo.imag, header=hdu1.header)
+        combo_hdu = fits.HDUList([hdu1,hdu2])
     else:
         return combo
