@@ -174,9 +174,7 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     if not return_hdu:
         return combo
     elif return_hdu:
-        hdu1 = fits.ImageHDU(data=combo.real, header=w1.to_header())
-        hdu2 = fits.ImageHDU(data=combo.imag, header=w1.to_header())
-        combo_hdu = fits.HDUList([hdu1,hdu2])
+        combo_hdu = fits.PrimaryHDU(data=np.abs(combo), header=w1.to_header())
         return combo_hdu
 
 
@@ -255,8 +253,6 @@ def feather_simple(hires, lores,
     if return_regridded_lores:
         return combo, hdu2
     elif return_hdu:
-        hdu1 = fits.ImageHDU(data=combo.real, header=hdu1.header)
-        hdu2 = fits.ImageHDU(data=combo.imag, header=hdu1.header)
-        combo_hdu = fits.HDUList([hdu1,hdu2])
+        combo_hdu = fits.PrimaryHDU(data=np.abs(combo), header=hdu1.header)
     else:
         return combo
