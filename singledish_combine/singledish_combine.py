@@ -22,7 +22,9 @@ def combine_cband():
 def fourier_combine_cubes(cube1, cube2, highresextnum=0,
                           highresscalefactor=1.0,
                           lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
-                          return_regridded_cube2=False):
+                          return_regridded_cube2=False,
+                          return_hdu=False,
+                         ):
     """
     Fourier combine two data cubes
 
@@ -90,11 +92,15 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
 
     if return_regridded_cube2:
         return outcube, f2
+    elif return_hdu:
+        return fits.PrimaryHDU(data=outcube, header=w1.to_header())
     else:
         return outcube
 
 def fourier_combine(highresfitsfile, lowresfitsfile,
-                    matching_scale=60*u.arcsec, scale=False):
+                    matching_scale=60*u.arcsec, scale=False,
+                    return_hdu=False,
+                   ):
     """
     Simple reimplementation of 'feather'
     """
@@ -162,7 +168,11 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
 
     combo = np.fft.ifft2(fftsum)
 
-    return combo
+    if not return_hdu:
+        return combo
+    elif return_hdu:
+        combo_hdu = fits.PrimaryHDU(data=combo, header=w1.to_header())
+        return combo_hdu
 
 
 def feather_simple(hires, lores,
@@ -170,6 +180,7 @@ def feather_simple(hires, lores,
                    lowresextnum=0,
                    highresscalefactor=1.0,
                    lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
+                   return_hdu=False,
                    return_regridded_lores=False):
     """
     Fourier combine two data cubes
@@ -190,6 +201,8 @@ def feather_simple(hires, lores,
         The full-width-half-max of the single-dish (low-resolution) beam;
         or the scale at which you want to try to match the low/high resolution
         data
+    return_hdu : bool
+        Return an HDU instead of just an image
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
@@ -235,5 +248,8 @@ def feather_simple(hires, lores,
 
     if return_regridded_lores:
         return combo, hdu2
+    elif return_hdu:
+        combo_hdu = fits.PrimaryHDU(data=combo, header=hdu1.header)
+        return combo_hdu
     else:
         return combo
