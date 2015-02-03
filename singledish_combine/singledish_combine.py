@@ -22,7 +22,9 @@ def combine_cband():
 def fourier_combine_cubes(cube1, cube2, highresextnum=0,
                           highresscalefactor=1.0,
                           lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
-                          return_regridded_cube2=False):
+                          return_regridded_cube2=False,
+                          return_hdu=False,
+                         ):
     """
     Fourier combine two data cubes
 
@@ -42,6 +44,9 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
         The full-width-half-max of the single-dish (low-resolution) beam;
         or the scale at which you want to try to match the low/high resolution
         data
+    return_hdu : bool
+        Return an HDU instead of just a cube.  It will contain two image
+        planes, one for the real and one for the imaginary data.
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
@@ -90,11 +95,15 @@ def fourier_combine_cubes(cube1, cube2, highresextnum=0,
 
     if return_regridded_cube2:
         return outcube, f2
+    elif return_hdu:
+        return fits.PrimaryHDU(data=outcube, header=w1.to_header())
     else:
         return outcube
 
 def fourier_combine(highresfitsfile, lowresfitsfile,
-                    matching_scale=60*u.arcsec, scale=False):
+                    matching_scale=60*u.arcsec, scale=False,
+                    return_hdu=False,
+                   ):
     """
     Simple reimplementation of 'feather'
     """
@@ -115,7 +124,13 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
     center = w1.sub([wcs.WCSSUB_CELESTIAL]).wcs_pix2world([nax1/2.],
                                                           [nax2/2.],
                                                           1)
-    galcenter = coordinates.SkyCoord(*(center*u.deg), frame='icrs').galactic
+    frame = 'icrs' if w1.celestial.wcs.ctype[0][:2] == 'RA' else 'galactic'
+    if w2.celestial.wcs.ctype[0][:2] == 'RA':
+        center = coordinates.SkyCoord(*(center*u.deg), frame=frame).fk5
+        cxy = center.ra.deg,center.dec.deg
+    elif w2.celestial.wcs.ctype[0][:4] == 'GLON':
+        center = coordinates.SkyCoord(*(center*u.deg), frame=frame).galactic
+        cxy = center.l.deg,center.b.deg
 
     im1 = f1[0].data.squeeze()
     im1[np.isnan(im1)] = 0
@@ -129,11 +144,13 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
         if shape[0] != im2raw.shape[0]:
             raise ValueError("Spectral dimensions of cubes do not match.")
 
+    center_pixel = w2.sub([wcs.WCSSUB_CELESTIAL]).wcs_world2pix(cxy[0], cxy[1],
+                                                                0)[::-1]
+
     zoomed = zoom_on_pixel(np.nan_to_num(im2raw),
-                           w2.sub([wcs.WCSSUB_CELESTIAL]).wcs_world2pix(galcenter.l.deg,
-                                                                        galcenter.b.deg,
-                                                                        0)[::-1],
-                           usfac=pixscale2/pixscale1, outshape=shape)
+                           center_pixel,
+                           usfac=np.abs(pixscale2/pixscale1),
+                           outshape=shape)
 
     im2 = zoomed
 
@@ -154,7 +171,7 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
 
     xgrid,ygrid = (np.indices(shape)-np.array([(shape[0]-1.)/2,(shape[1]-1.)/2.])[:,None,None])
     
-    sigma = (shape[0]/((matching_scale/(pixscale1*u.deg)).decompose().value)) / np.sqrt(8*np.log(2))
+    sigma = np.abs(shape[0]/((matching_scale/(pixscale1*u.deg)).decompose().value)) / np.sqrt(8*np.log(2))
     kernel = np.fft.fftshift( np.exp(-(xgrid**2+ygrid**2)/(2*sigma**2)) )
     kernel/=kernel.max()
 
@@ -162,7 +179,11 @@ def fourier_combine(highresfitsfile, lowresfitsfile,
 
     combo = np.fft.ifft2(fftsum)
 
-    return combo
+    if not return_hdu:
+        return combo
+    elif return_hdu:
+        combo_hdu = fits.PrimaryHDU(data=np.abs(combo), header=w1.to_header())
+        return combo_hdu
 
 
 def feather_simple(hires, lores,
@@ -170,6 +191,7 @@ def feather_simple(hires, lores,
                    lowresextnum=0,
                    highresscalefactor=1.0,
                    lowresscalefactor=1.0, lowresfwhm=1*u.arcmin,
+                   return_hdu=False,
                    return_regridded_lores=False):
     """
     Fourier combine two data cubes
@@ -190,12 +212,19 @@ def feather_simple(hires, lores,
         The full-width-half-max of the single-dish (low-resolution) beam;
         or the scale at which you want to try to match the low/high resolution
         data
+    return_hdu : bool
+        Return an HDU instead of just an image.  It will contain two image
+        planes, one for the real and one for the imaginary data.
     return_regridded_cube2 : bool
         Return the 2nd cube regridded into the pixel space of the first?
     """
-    if not isinstance(hires, (fits.ImageHDU, fits.PrimaryHDU)):
+    if isinstance(hires, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu1 = hires
+    else:
         hdu1 = fits.open(hires)[highresextnum]
-    if not isinstance(lores, (fits.ImageHDU, fits.PrimaryHDU)):
+    if isinstance(lores, (fits.ImageHDU, fits.PrimaryHDU)):
+        hdu2 = lores
+    else:
         hdu2 = fits.open(lores)[lowresextnum]
     im1 = hdu1.data.squeeze()
     hd1 = FITS_tools.strip_headers.flatten_header(hdu1.header)
@@ -203,11 +232,10 @@ def feather_simple(hires, lores,
     pixscale = FITS_tools.header_tools.header_to_platescale(hd1)
     log.debug('pixscale = {0}'.format(pixscale))
 
-    #im2raw = hdu2.data.squeeze()
-    #hd2 = FITS_tools.strip_headers.flatten_header(hdu2.header)
-    #assert hd2['NAXIS'] == im2.ndim == 2
-    #w2 = cube2.wcs
-    #pixscale = FITS_tools.header_tools.header_to_platescale(hd2)
+    im2raw = hdu2.data.squeeze()
+    hd2 = FITS_tools.strip_headers.flatten_header(hdu2.header)
+    assert hd2['NAXIS'] == im2raw.ndim == 2
+    hdu2 = fits.PrimaryHDU(data=im2raw, header=hd2)
 
     hdu2 = hcongrid_hdu(hdu2, hd1)
     im2 = hdu2.data.squeeze()
@@ -235,5 +263,7 @@ def feather_simple(hires, lores,
 
     if return_regridded_lores:
         return combo, hdu2
+    elif return_hdu:
+        combo_hdu = fits.PrimaryHDU(data=np.abs(combo), header=hdu1.header)
     else:
         return combo
