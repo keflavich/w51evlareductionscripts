@@ -8,7 +8,7 @@ outputvis = 'h2co_empirical_velocut'
 if not os.path.exists(outputvis):
     vis = '../13A-064.sb28612538.eb29114303.56766.55576449074.ms'
     split(vis=vis, outputvis=outputvis, datacolumn='corrected',
-          spw='17:530~620', field='', width=1)
+          spw='17:530~630', field='', width=1)
 vis = outputvis
 
 phasecaltable = '../ch3oh/ch3oh_selfcal_phase09'
