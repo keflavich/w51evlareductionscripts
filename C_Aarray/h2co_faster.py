@@ -22,7 +22,7 @@ flagdata(vis=vis, mode='clip', clipzeros=True)
 flagmanager(vis=vis, mode='save', versionname='cleanflags', comment='Flagged no antennae, zeros, and NOTHING from applycal.')
 
 clearcal(vis=vis)
-pfx = 'h2co_line_empirical_velocutkms.nocal'
+pfx = 'h2co_line_empirical_velocut.nocal'
 os.system('rm -rf {0}.*'.format(pfx))
 clean(vis=vis, spw='0', imagename=pfx,
       field='W51 Ku',
@@ -33,7 +33,7 @@ clean(vis=vis, spw='0', imagename=pfx,
 exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
 
 uvcontsub(vis=vis, field='W51 Ku')
-pfx = 'h2co_line_empirical_velocutkms.nocal.uvcontsub.dirty'
+pfx = 'h2co_line_empirical_velocut.nocal.uvcontsub.dirty'
 os.system('rm -rf {0}*'.format(pfx))
 clean(vis=vis+'.contsub', spw='0', imagename=pfx,
       field='W51 Ku',
@@ -50,7 +50,7 @@ applycal(vis=vis,
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 delmod(vis=vis)
-pfx = 'h2co_line_empirical_velocutkms.crosscal'
+pfx = 'h2co_line_empirical_velocut.crosscal'
 os.system('rm -rf {0}*'.format(pfx))
 clean(vis=vis, spw='0', imagename=pfx,
       field='W51 Ku',
@@ -60,7 +60,7 @@ clean(vis=vis, spw='0', imagename=pfx,
       selectdata=True)
 exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
 
-pfx = 'h2co_line_empirical_velocutkms.crosscal.modelstart'
+pfx = 'h2co_line_empirical_velocut.crosscal.modelstart'
 os.system('rm -rf {0}*'.format(pfx))
 clean(vis=vis, spw='0', imagename=pfx,
       field='W51 Ku',
@@ -72,9 +72,9 @@ clean(vis=vis, spw='0', imagename=pfx,
 exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
 
 # May 20
-vis = 'h2co_empirical_velocutkms'
+vis = 'h2co_empirical_velocut'
 uvcontsub(vis=vis, field='W51 Ku')
-pfx = 'h2co_line_empirical_velocutkms.crosscal.uvcontsub'
+pfx = 'h2co_line_empirical_velocut.crosscal.uvcontsub'
 os.system('rm -rf {0}*'.format(pfx))
 clean(vis=vis+'.contsub', spw='0', imagename=pfx,
       field='W51 Ku',
