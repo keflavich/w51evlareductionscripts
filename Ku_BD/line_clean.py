@@ -32,7 +32,8 @@ clean(vis='W51_Ku_BD_spw11_concat.ms',
 
 exportfits('W51Ku_BD_spw11.big.clean.image','W51Ku_BD_spw11.big.clean.image.fits')
 
-uvcontsub(vis='W51_Ku_BD_spw19_concat.ms',fitspw='0:100~500,0:700~950',fitorder=1,want_cont=True,field='W51 Ku')
+uvcontsub(vis='W51_Ku_BD_spw19_concat.ms', fitspw='0:100~500, 0:700~950',
+          fitorder=1, want_cont=True, field='W51 Ku')
 
 clean(vis='W51_Ku_BD_spw19_concat.ms.contsub',
       field='W51 Ku',
