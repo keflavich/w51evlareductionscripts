@@ -3,7 +3,7 @@ Feb 6, 2015: created this to match the h2co_merge.py C-band cubes.
 Natural weighting is probably best but the robust will be nice for the cores.
 May need to do a uniform weighted one too?
 """
-vis = 'W51_Ku_BD_spw19_concat.ms'
+vis = 'W51_Ku_BD_spw19_concat2.ms'
 
 imagename='W51Ku_BD_h2co_v30to90_natural_dirty'
 clean(vis=vis,
