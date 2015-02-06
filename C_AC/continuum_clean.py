@@ -1,11 +1,13 @@
 """
 5/27/2014: merged A/C continuum?
 """
-vis = 'W51C_ACcontinuum_concat_FULL.ms'
+# not used vis = 'W51C_ACcontinuum_concat_FULL.ms'
 
 low,high = '8,9,10,11,12,13,14,15','0,1,2,3,4,5,6,7'
 both = ",".join([low,high])
 niter = {'dirty':0, 'clean':int(1e5), 'veryclean':int(1e6)}
+vis = ['../W51_C_C/13A-064.sb21341436.eb23334759.56447.48227415509.ms',
+       '../W51_C_A/13A-064.sb28612538.eb29114303.56766.55576449074.ms']
 
 def myclean(spw, name,
             dirtyclean='dirty',
@@ -61,15 +63,18 @@ def myclean(spw, name,
 #myclean(both,'4096_both_uniform','clean',weighting='uniform',imsize=[4096,4096],cell=['0.075 arcsec'])
 
 # 2/6/2015: need it bigggerrrrr!!!!
+myclean(spw=both, name='4096_both_uniform_dirty', dirtyclean='dirty',
+        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+        vis=vis)
 myclean(spw=both, name='4096_both_uniform', dirtyclean='clean',
         weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+        vis=vis)
 myclean(spw=low, name='4096_low_uniform', dirtyclean='clean',
         weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+        vis=vis)
 myclean(spw=high, name='4096_high_uniform', dirtyclean='clean',
         weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+        vis=vis)
 #myclean(spw=both, name='2048_both_uniform', dirtyclean='clean',
 #        weighting='uniform', imsize=[2048, 2048], cell=['0.075 arcsec'],
 #        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
