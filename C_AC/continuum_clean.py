@@ -60,11 +60,21 @@ def myclean(spw, name,
 #myclean(both,'2048_channel_both_uniform','clean',weighting='uniform',mode='channel',imsize=[2048,2048],cell=['0.1 arcsec'])
 #myclean(both,'4096_both_uniform','clean',weighting='uniform',imsize=[4096,4096],cell=['0.075 arcsec'])
 
-myclean(spw=both, name='2048_both_uniform', dirtyclean='clean',
-        weighting='uniform', imsize=[2048, 2048], cell=['0.075 arcsec'],
+# 2/6/2015: need it bigggerrrrr!!!!
+myclean(spw=both, name='4096_both_uniform', dirtyclean='clean',
+        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
         vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
-
-# 5/2/2014: per Baobab's recommendation, image each SPW.
-for spw in range(12):
-    myclean(str(spw),'2048_spw%i_uniform' % spw,'clean',
-            weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'])
+myclean(spw=low, name='4096_low_uniform', dirtyclean='clean',
+        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+myclean(spw=high, name='4096_high_uniform', dirtyclean='clean',
+        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+#myclean(spw=both, name='2048_both_uniform', dirtyclean='clean',
+#        weighting='uniform', imsize=[2048, 2048], cell=['0.075 arcsec'],
+#        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
+#
+## 5/2/2014: per Baobab's recommendation, image each SPW.
+#for spw in range(12):
+#    myclean(str(spw),'2048_spw%i_uniform' % spw,'clean',
+#            weighting='uniform', imsize=[2048,2048], cell=['0.075 arcsec'])
