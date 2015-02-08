@@ -50,7 +50,7 @@ uvcontsub(vis_A)
 
 
 
-uvcontsub(vis=vis, field='W51 Ku')
+#uvcontsub(vis=vis, field='W51 Ku')
 # BE CAREFUL: if vis == pfx, may delete the vis
 pfx = 'h111a_line-150to150kms_uniform.contsub'
 os.system('rm -rf {0}.*'.format(pfx))
@@ -64,5 +64,22 @@ clean(vis=vis, spw='0', imagename=pfx,
       weighting='uniform', imsize=[1024,1024], cell=['0.1 arcsec'],
       threshold='1 mJy', niter=1000,
       usescratch=True,
+      restfreq='4.744183027188663GHz',
+      selectdata=True)
+exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
+
+pfx = 'h111a_line-150to150kms_natural.contsub'
+os.system('rm -rf {0}.*'.format(pfx))
+clean(vis=vis, spw='0', imagename=pfx,
+      field='W51 Ku',
+      mode='velocity', 
+      start='-150km/s',
+      width='2km/s',
+      nchan=150,
+      interpolation='linear',
+      weighting='natural', imsize=[1024,1024], cell=['0.1 arcsec'],
+      threshold='1 mJy', niter=1000,
+      usescratch=True,
+      restfreq='4.744183027188663GHz',
       selectdata=True)
 exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
