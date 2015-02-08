@@ -41,8 +41,10 @@ applycal(vis=vis_C,
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 
-uvcontsub(vis_C)
-uvcontsub(vis_A)
+uvcontsub(vis=vis_A, fitspw='0:100~500, 0:700~950',
+          fitorder=1, want_cont=True, field='W51 Ku')
+uvcontsub(vis=vis_C, fitspw='0:100~500, 0:700~950',
+          fitorder=1, want_cont=True, field='W51 Ku')
 
 
 imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_selfcal_dirty'
@@ -128,3 +130,61 @@ clean(vis=[vis_A+".contsub",vis_C+".contsub"],
       restfreq='4.82966GHz')
 exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
 exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
+imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_natural_selfcal_clean'
+os.system('rm -rf {0}.*'.format(imagename))
+clean(vis=[vis_A+".contsub",vis_C+".contsub"],
+      imagename=imagename, field='W51 Ku', 
+      mode='velocity', 
+      start='30km/s',
+      width='0.5km/s',
+      nchan=120,
+      interpolation='linear',
+      weighting='natural',
+      niter=10000, spw='0', cell=['0.2 arcsec'],
+      imsize=[1024,1024],
+      outframe='LSRK',
+      multiscale=[0,3,6,12,24],
+      usescratch=T,
+      threshold='1.0 mJy',
+      chaniter=True,
+      restfreq='4.82966GHz')
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
+
+# Continua for making tau cubes (want identical clean beam, etc.)
+imagename = 'H2CO_11_speccube_continuum_AC_1024_0.1as_natural_selfcal_clean'
+os.system('rm -rf {0}.*'.format(imagename))
+clean(vis=[vis_A+".cont",vis_C+".cont"],
+      imagename=imagename, field='W51 Ku', 
+      mode='mfs', 
+      weighting='natural',
+      niter=10000, spw='0', cell=['0.2 arcsec'],
+      imsize=[1024,1024],
+      outframe='LSRK',
+      multiscale=[0,3,6,12,24],
+      usescratch=T,
+      threshold='0.1 mJy',
+      chaniter=True,
+      restfreq='4.82966GHz')
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
+imagename = 'H2CO_11_speccube_continuum_AC_1024_0.1as_uniform_selfcal_clean'
+os.system('rm -rf {0}.*'.format(imagename))
+clean(vis=[vis_A+".cont",vis_C+".cont"],
+      imagename=imagename, field='W51 Ku', 
+      mode='mfs', 
+      weighting='uniform',
+      niter=10000, spw='0', cell=['0.1 arcsec'],
+      imsize=[1024,1024],
+      outframe='LSRK',
+      multiscale=[0,3,6,12,24],
+      usescratch=T,
+      threshold='0.1 mJy',
+      chaniter=True,
+      restfreq='4.82966GHz')
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
