@@ -4,4 +4,4 @@
 *.residual
 *.model
 *.psf
-
+*pyc
