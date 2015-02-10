@@ -5,3 +5,4 @@
 *.model
 *.psf
 *pyc
+ipython_log*py
