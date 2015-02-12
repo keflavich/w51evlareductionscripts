@@ -111,7 +111,7 @@ clean(vis=[vis_A+".contsub",vis_C+".contsub"],
 exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
 exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
 
-imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_selfcal'
+imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_selfcal_clean'
 os.system('rm -rf {0}.*'.format(imagename))
 clean(vis=[vis_A+".contsub",vis_C+".contsub"],
       imagename=imagename,field='W51 Ku', 
