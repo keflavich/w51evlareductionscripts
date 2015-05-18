@@ -4,8 +4,7 @@ import pyspeckit
 import os
 import pyregion
 import time
-if not os.path.exists('spectra'):
-    os.mkdir("spectra")
+import paths
 
 spectra = []
 
@@ -26,7 +25,7 @@ for fn in ('H77a_BDarray_speccube_uniform_contsub_cvel_big2.fits',
         print "dt=%g" % (time.time()-t0), name,R
         S = C.get_apspec(R.coord_list,coordsys='celestial',wunit='degree')
         spectra.append(S)
-        S.write('spectra/%s_%s.fits' % (prefix,name))
+        S.write('spectra/%s_%s.fits' % (prefix,name), write_error=False)
 
     print "Beginning cleanup at ",(time.time()-t0)
     del S,C
