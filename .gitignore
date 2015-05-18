@@ -5,4 +5,5 @@
 *.model
 *.psf
 *pyc
+*.fits
 ipython_log*py
