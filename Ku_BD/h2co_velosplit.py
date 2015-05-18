@@ -51,6 +51,7 @@ clean(vis=vis,
       outframe='LSRK',
       pbcor=T,
       restfreq='14.488479GHz',
+      minpb=0.4,
       usescratch=T)
 exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
 
