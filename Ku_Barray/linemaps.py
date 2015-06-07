@@ -128,7 +128,7 @@ clean(vis=narrowvis,
         restfreq='14.12861GHz')
 exportfits(imagename=imagename+".image", fitsimage=imagename+".fits", overwrite=True)
 
-uvcontsub(vis='spw15_Barray_h77a.ms',field='W51 Ku',fitspw='0:10~200;300~500', solint='int',fitorder=0,combine='')
+#uvcontsub(vis='spw15_Barray_h77a.ms',field='W51 Ku',fitspw='0:10~200;300~500', solint='int',fitorder=0,combine='')
 uvcontsub(vis='spw15_Barray_h77a.ms',field='W51 Ku',fitspw='0:50~120,0:290~472', spw='0:50~472', solint='int',fitorder=0,combine='spw')
 imagename = 'H77a_Barray_speccube_uniform_contsub'
 clean(vis=narrowvis+".contsub",imagename=imagename,field='W51 Ku', mode='velocity', 
