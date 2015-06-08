@@ -84,6 +84,10 @@ clean(vis=vis, spw='0', imagename=pfx,
       selectdata=True)
 exportfits('{0}.image'.format(pfx),'{0}.image.fits'.format(pfx))
 
+# These data are pretty ugly; I think the badness comes from the C-band because
+# there are large-angular-scale patchy bits
+# The continuum subtraction is pretty bad too; it needs additional baseline
+# subtraction after the fact
 pfx = 'h111a_line-150to150kms_natural.dirty.contsub'
 os.system('rm -rf {0}.*'.format(pfx))
 clean(vis=vis, spw='0', imagename=pfx,
