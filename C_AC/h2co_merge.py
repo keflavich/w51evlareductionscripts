@@ -34,12 +34,16 @@ applycal(vis=vis_A,
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 
-Cphasecaltable = '../../W51_C_C/continuum/cont_spw2_selfcal_phase02'
-Cblcaltable = '../../W51_C_C/continuum/cont_spw2_selfcal_blcal'
-applycal(vis=vis_C,
-         gaintable=[Cphasecaltable,Cblcaltable],
-         interp='linear',
-         flagbackup=True) # was False when flagmanager was used
+#Cphasecaltable = '../../W51_C_C/continuum/cont_spw2_selfcal_phase02'
+#Cblcaltable = '../../W51_C_C/continuum/cont_spw2_selfcal_blcal'
+# June 15 2015: the CH3OH self-cal is really bad.
+#Cphasecaltable = '../W51_C_C/ch3oh/ch3oh_selfcal_phase09'
+#Campcaltable = '../W51_C_C/ch3oh/ch3oh_selfcal_ampphase'
+#Cblcaltable = '../W51_C_C/ch3oh/ch3oh_selfcal_blcal'
+#applycal(vis=vis_C,
+#         gaintable=[Cphasecaltable,Campcaltable,Cblcaltable],
+#         interp='linear',
+#         flagbackup=True) # was False when flagmanager was used
 
 uvcontsub(vis=vis_A, fitspw='0:100~500, 0:700~950',
           fitorder=1, want_cont=True, field='W51 Ku')

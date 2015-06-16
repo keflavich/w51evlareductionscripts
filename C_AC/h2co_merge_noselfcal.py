@@ -29,8 +29,9 @@ uvcontsub(vis=vis_A, fitspw='0:100~500, 0:700~950',
 uvcontsub(vis=vis_C, fitspw='0:100~500, 0:700~950',
           fitorder=1, want_cont=True, field='W51 Ku')
 
-vis = 'h2co11_Cband_AC_nocal.ms'
-concat(vis=[vis_A,vis_C], concatvis=vis)
+#vis = 'h2co11_Cband_AC_nocal.ms'
+#concat(vis=[vis_A,vis_C], concatvis=vis)
+vis = concatvis = [vis_A, vis_C]
 
 
 imagename = 'H2CO_11_speccube_contsub_AC_1024_0.1as_uniform_dirty'

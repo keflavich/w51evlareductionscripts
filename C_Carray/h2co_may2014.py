@@ -9,15 +9,34 @@ listobs(outvis)
 uvcontsub(outvis)
 listobs(outvis+".contsub")
 
-phasecaltable = '../continuum/cont_spw2_selfcal_phase02'
-#ampcaltable = '../ch3oh/ch3oh_selfcal_ampphase'
-blcaltable = '../continuum/cont_spw2_selfcal_blcal'
+#phasecaltable = '../continuum/cont_spw2_selfcal_phase02'
+##ampcaltable = '../ch3oh/ch3oh_selfcal_ampphase'
+#blcaltable = '../continuum/cont_spw2_selfcal_blcal'
+phasecaltable = '../ch3oh/ch3oh_selfcal_phase09'
+caltable = '../ch3oh/ch3oh_selfcal_ampphase'
+blcaltable = '../ch3oh/ch3oh_selfcal_blcal'
 applycal(vis=outvis+".contsub",
-         gaintable=[phasecaltable,blcaltable],
+         gaintable=[phasecaltable,caltable,blcaltable],
          interp='linear',
          flagbackup=True) # was False when flagmanager was used
 
-imagename = 'H2CO_11_speccube_contsub_1024_1as_uniform_selfcal'
+imagename = 'H2CO_11_cband_speccube_contsub_1024_1as_uniform_selfcal_dirty'
+os.system('rm -rf {0}.*'.format(imagename))
+clean(vis=outvis+".contsub",
+      imagename=imagename,field='W51 Ku', 
+      mode='channel', 
+      weighting='uniform', niter=0, spw='0', cell=['1.0 arcsec'],
+      imsize=[1024,1024],
+      outframe='LSRK',
+      multiscale=[0,3,6,12,24],
+      usescratch=T,
+      threshold='3.0 mJy',
+      chaniter=True,
+      restfreq='4.82966GHz')
+exportfits(imagename=imagename+".image", fitsimage=imagename+".image.fits", overwrite=True)
+exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits", overwrite=True)
+
+imagename = 'H2CO_11_cband_speccube_contsub_1024_1as_uniform_selfcal'
 os.system('rm -rf {0}.*'.format(imagename))
 clean(vis=outvis+".contsub",
       imagename=imagename,field='W51 Ku', 
