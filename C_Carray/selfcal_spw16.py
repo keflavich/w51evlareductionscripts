@@ -24,6 +24,10 @@ notes:
     the more I go through this, the more it looks like subtle tweaks to the clean are more important than selfcal
 
     flagged ea08 because its phases had a really weird shape when self-cal'd
+
+    finally, with niter=1000 and imsize=160, the image looks pretty good, but I
+    simply don't believe it.  As Henrik said, you're forcing in what you
+    model...
 """
 
 # first model, I guess
