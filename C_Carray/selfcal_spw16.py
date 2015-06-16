@@ -22,6 +22,8 @@ notes:
     smallscalebias increased to 0.8 because again I think the large-scale emission messes up the image
 
     the more I go through this, the more it looks like subtle tweaks to the clean are more important than selfcal
+
+    flagged ea08 because its phases had a really weird shape when self-cal'd
 """
 
 # first model, I guess
