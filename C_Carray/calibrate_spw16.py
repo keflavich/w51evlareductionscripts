@@ -166,12 +166,26 @@ applycal(vis=spw17vis,field=source, \
          interp=['','','nearest','nearest','linear','linear',''], \
          parang=False,calwt=False)
 
-imagename = 'CbandCarray_spw17_raw_continuum_cal_dirty'
+spw16vis='CbandCarray_spw16_raw_continuum.ms'
+split(vis=spw16vis, outputvis='CbandCarray_spw16_cal_continuum.ms', width=128, datacolumn='corrected', spw='0')
+
+
+imagename = 'CbandCarray_spw17_continuum_cal_dirty'
 clean(vis=spw17vis,
       imagename=imagename,
       field=source,
       weighting='briggs', imsize=[256,256], cell=['1.0 arcsec'],
       mode='mfs', threshold='20 mJy', niter=0,
+      selectdata=True)
+exportfits(imagename+".image", imagename+".image.fits", overwrite=True, dropdeg=True)
+
+
+imagename = 'CbandCarray_spw17_continuum_cal_clean'
+clean(vis=spw17vis,
+      imagename=imagename,
+      field=source,
+      weighting='briggs', imsize=[256,256], cell=['1.0 arcsec'],
+      mode='mfs', threshold='20 mJy', niter=10000,
       selectdata=True)
 exportfits(imagename+".image", imagename+".image.fits", overwrite=True, dropdeg=True)
 
