@@ -168,6 +168,8 @@ applycal(vis=spw17vis,field=source, \
 
 spw16vis='CbandCarray_spw16_raw_continuum.ms'
 split(vis=spw16vis, outputvis='CbandCarray_spw16_cal_continuum.ms', width=128, datacolumn='corrected', spw='0')
+spw17vis='CbandCarray_spw17_raw_continuum.ms'
+split(vis=spw17vis, outputvis='CbandCarray_spw17_cal_continuum.ms', width=1024, datacolumn='corrected', spw='0')
 
 
 imagename = 'CbandCarray_spw17_continuum_cal_dirty'
