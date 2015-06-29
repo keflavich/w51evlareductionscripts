@@ -54,8 +54,9 @@ Use non-pipeline C_array June 29, 2015
 
 # from h2co_cvel_split
 # the "cal" version of h2co11_CC is hand-calibrated (not pipeline)
-vis_A = 'h2co11_Cband_Aarray_nocal_20to100kms.ms'
-vis_C = 'h2co11_Cband_Carray_cal_20to100kms.ms'
+# RUN THIS IN '/scratch/aginsbur/W51_C/h2co'
+vis_A = '../h2co11_Cband_Aarray_nocal_20to100kms.ms'
+vis_C = '../h2co11_Cband_Carray_cal_20to100kms.ms'
 uvcontsub(vis=vis_A, fitspw='0:30~80kms', excludechans=True,
           fitorder=1, want_cont=True, field='W51 Ku')
 uvcontsub(vis=vis_C, fitspw='0:30~80kms', excludechans=True,
