@@ -7,6 +7,8 @@ import os
 import pyregion
 import time
 import paths
+from astropy import units as u
+import radio_beam
 
 spectra = []
 
@@ -20,8 +22,17 @@ for fn in (
             #'W51Ku_BD_spw19.bigish_uniform_contsub19.cvel.clean.image.fits', this isn't h77a
           ):
 
-    print "dt=%g" % (time.time()-t0), fn
-    C = spectral_cube.SpectralCube.read(paths.dpath(fn)).with_spectral_unit(u.km/u.s)
+    print("dt=%g" % (time.time()-t0), fn)
+    C = spectral_cube.SpectralCube.read(paths.dpath(fn)).with_spectral_unit(u.km/u.s,
+                                                                            velocity_convention='radio')
+
+    errspec = C.std(axis=(1,2))
+    pix_area = np.abs(np.product(np.diag(C.wcs.celestial.pixel_scale_matrix)))
+    beam = radio_beam.Beam.from_fits_header(C.header)
+    ppbeam = beam.sr.to(u.deg**2).value/pix_area
+
+    JyToK = u.Jy.to(u.K, equivalencies=u.brightness_temperature(beam,
+                                                                C.wcs.wcs.restfrq*u.Hz))
 
     prefix = fn.split(".")[0]
 
@@ -33,6 +44,9 @@ for fn in (
         S = sc.mean(axis=(1,2))
         spectra.append(S)
 
+        hdu = S.hdu
+        hdu.header['JYTOK'] = JyToK
+
         outfilename = paths.dpath("spectra_h77/{0}_{1}.fits".format(prefix,
                                                                     name))
-        S.write(outfilename, overwrite=True)
+        hdu.writeto(outfilename, clobber=True)
