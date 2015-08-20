@@ -35,6 +35,7 @@ clean(vis=vis, spw='0', imagename='ch3oh_256_e2zoom_chan615to635',
       weighting='uniform', imsize=[256,256], cell=['0.1 arcsec'],
       mode='channel', threshold='20 mJy', niter=200,
       selectdata=True, nchan=20, start=615-550,
+      outframe = 'lsrk',
       phasecenter='J2000 19h23m43.848 +14d30m31.08')
 exportfits('ch3oh_256_e2zoom_chan615to635.image','ch3oh_256_e2zoom_chan615to635.image.fits')
 
@@ -44,8 +45,29 @@ clean(vis=vis, spw='0', imagename='ch3oh_256_e2zoom_chan550to700',
       weighting='uniform', imsize=[256,256], cell=['0.1 arcsec'],
       mode='channel', threshold='20 mJy', niter=200,
       selectdata=True, nchan=150, start=0,
+      outframe = 'lsrk',
       phasecenter='J2000 19h23m43.848 +14d30m31.08')
 exportfits('ch3oh_256_e2zoom_chan550to700.image','ch3oh_256_e2zoom_chan550to700.image.fits')
+
+os.system('rm -rf ch3oh_512_e2zoom_chan550to700*')
+clean(vis=vis, spw='0', imagename='ch3oh_512_e2zoom_chan550to700',
+      field='W51 Ku',
+      weighting='uniform', imsize=[512,512], cell=['0.05 arcsec'],
+      mode='channel', threshold='7 mJy', niter=1000,
+      selectdata=True, nchan=150, start=0,
+      outframe = 'lsrk',
+      phasecenter='J2000 19h23m43.848 +14d30m31.08')
+exportfits('ch3oh_512_e2zoom_chan550to700.image','ch3oh_512_e2zoom_chan550to700.image.fits')
+
+os.system('rm -rf ch3oh_256_irs3zoom_chan550to700*')
+clean(vis=vis, spw='0', imagename='ch3oh_256_irs3zoom_chan550to700',
+      field='W51 Ku',
+      weighting='uniform', imsize=[256,256], cell=['0.05 arcsec'],
+      mode='channel', threshold='7 mJy', niter=1000,
+      selectdata=True, nchan=150, start=0,
+      outframe = 'lsrk',
+      phasecenter='J2000 19h23m43.184 +14d30m49.95')
+exportfits('ch3oh_256_irs3zoom_chan550to700.image','ch3oh_256_irs3zoom_chan550to700.image.fits')
 
 #clean(vis=vis, spw='7', imagename=['ch3oh_256_chan632_e2','ch3oh_256_chan632_irs1'],
 #      field='W51 Ku',
