@@ -13,12 +13,17 @@ import radio_beam
 spectra = []
 
 regions = pyregion.open(paths.rpath('w51_e_apertures.reg'))
+more_regions = pyregion.open(paths.rpath('w51_apertures.reg'))
+region_names = [r.attr[1]['text'] for r in regions]
+for r in more_regions:
+    if r.attr[1]['text'] not in region_names:
+        regions.append(r)
 
 t0 = time.time()
 
 for fn in (
            'H77a_BDarray_speccube_uniform_contsub_cvel_big.fits',
-           'H77a_BDarray_speccube_uniform_contsub_cvel_big2.fits',
+           # redundant? 'H77a_BDarray_speccube_uniform_contsub_cvel_big2.fits',
             #'W51Ku_BD_spw19.bigish_uniform_contsub19.cvel.clean.image.fits', this isn't h77a
           ):
 
