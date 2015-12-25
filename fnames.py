@@ -5,6 +5,10 @@ cube_names = {
     '22_briggs0': 'W51Ku_BD_h2co_v30to90_briggs0_contsub.image.fits',
 }
 
+rrl_cube_names = {
+    'H77a': 'H77a_BDarray_speccube_briggs0_contsub_cvel_big.fits',
+}
+
 continua = {
     '11_cont_uniform':'H2CO_11_speccube_continuum_AC_1024_0.1as_uniform_selfcal_clean.image.fits',
     #'11_cont_natural':'H2CO_11_speccube_continuum_AC_1024_0.1as_natural_selfcal_clean.image.fits',
