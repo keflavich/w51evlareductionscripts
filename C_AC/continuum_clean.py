@@ -69,16 +69,17 @@ def myclean(spw, name,
 vis = ['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms']
 myclean(spw=both, name='4096_both_uniform_contsplit', dirtyclean='dirty',
         weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-        vis=vis)
-myclean(spw=both, name='4096_both_uniform_contsplit', dirtyclean='clean',
-        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-        vis=vis)
-#myclean(spw=low, name='4096_low_uniform', dirtyclean='clean',
-#        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-#        vis=vis)
-#myclean(spw=high, name='4096_high_uniform', dirtyclean='clean',
-#        weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
-#        vis=vis)
+        vis=vis, multiscale=[0,5,15,45,135])
+for dirtyclean in ('clean','veryclean'):
+    myclean(spw=low, name='4096_low_uniform_contsplit', dirtyclean=dirtyclean,
+            weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+            vis=vis, multiscale=[0,5,15,45,135])
+    myclean(spw=high, name='4096_high_uniform_contsplit', dirtyclean=dirtyclean,
+            weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+            vis=vis, multiscale=[0,5,15,45,135])
+    myclean(spw=both, name='4096_both_uniform_contsplit', dirtyclean=dirtyclean,
+            weighting='uniform', imsize=[4096, 4096], cell=['0.075 arcsec'],
+            vis=vis, multiscale=[0,5,15,45,135])
 #myclean(spw=both, name='2048_both_uniform', dirtyclean='clean',
 #        weighting='uniform', imsize=[2048, 2048], cell=['0.075 arcsec'],
 #        vis=['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms'])
