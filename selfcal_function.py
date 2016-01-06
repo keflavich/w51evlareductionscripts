@@ -16,7 +16,8 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
             solint='30s', niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
             cell='0.1arcsec', weighting='uniform', robust=0.0, minsnr=3,
             psfmode='clark', shallowniter=100, midniter=1000, deepniter=1e4,
-            minblperant=4, gaintype='G'):
+            threshold='0.0mJy',
+            minblperant=4, gaintype='G', **kwargs):
     """
     Docstring incomplete
     """
@@ -25,8 +26,10 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # this code never actually worked.
     spwn = int(spw)
 
-    split(vis=vis, outputvis="selfcal_copy_{0}".format(vis))
     vis_for_selfcal = "selfcal_copy_{0}".format(vis)
+    os.system('rm -rf {0}'.format(vis_for_selfcal))
+    os.system('rm -rf {0}.flagversions'.format(vis_for_selfcal))
+    assert split(vis=vis, outputvis=vis_for_selfcal)
     flagmanager(vis=vis_for_selfcal, mode='save', versionname='original')
 
     shallowniter = int(shallowniter)
@@ -43,16 +46,17 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # Those are the official directions.  They are nonsense when dealing with
     # the extended emission of W51.
     # This first image is effectively discarded
-    imagename="selfcal_spw%i_shallowclean_iter0" % int(spw)
+    imagename="selfcal_{1}_spw{0}_shallowclean_iter0".format(spw, fieldstr)
 
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+imagename+suffix)
 
     clean(vis=vis_for_selfcal, field=field, imagename=imagename,
+          threshold=threshold,
           mode='mfs', psfmode=psfmode, multiscale=multiscale,
           weighting=weighting, robust=robust, niter=shallowniter,
           imsize=imsize, cell=cell, mask=cleanboxes, nterms=1,
-          interactive=INTERACTIVE, usescratch=True)
+          interactive=INTERACTIVE, usescratch=True, **kwargs)
     exportfits(imagename=imagename+".image", fitsimage=imagename+".fits",
                overwrite=True, dropdeg=True)
     exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits",
@@ -72,10 +76,11 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
             os.system("rm -rf "+first_image+suffix)
 
         clean(vis=vis_for_selfcal, imagename=first_image, field=field,
+              threshold=threshold,
               mode='mfs', psfmode=psfmode, multiscale=multiscale,
               weighting=weighting, robust=robust, niter=midniter,
               imsize=imsize, mask=cleanboxes, cell=cell, nterms=1,
-              usescratch=True, interactive=INTERACTIVE)
+              usescratch=True, interactive=INTERACTIVE, **kwargs)
         exportfits(imagename=first_image+".image",
                    fitsimage=first_image+".fits", overwrite=True,
                    dropdeg=True)
@@ -115,6 +120,8 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
 
         split(vis=vis_for_selfcal, outputvis=new_vis_for_selfcal,
               datacolumn='corrected')
+        flagmanager(vis=new_vis_for_selfcal, mode='save',
+                    versionname='original')
 
         vis_for_selfcal = new_vis_for_selfcal
 
@@ -126,10 +133,11 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+selfcal_image+suffix)
         clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
+              threshold=threshold,
               mode='mfs', psfmode=psfmode, multiscale=multiscale,
               weighting=weighting, robust=robust, niter=midniter,
               imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
-              usescratch=False, interactive=INTERACTIVE)
+              usescratch=False, interactive=INTERACTIVE, **kwargs)
         exportfits(imagename=selfcal_image+".image",
                    fitsimage=selfcal_image+".fits", overwrite=True,
                    dropdeg=True)
@@ -164,6 +172,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
 
     split(vis=vis_for_selfcal, outputvis=new_vis_for_selfcal,
           datacolumn='corrected')
+    flagmanager(vis=new_vis_for_selfcal, mode='save', versionname='original')
 
     vis_for_selfcal = new_vis_for_selfcal
 
@@ -172,8 +181,10 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
+          threshold=threshold,
           mask=cleanboxes, weighting=weighting, robust=robust, niter=deepniter,
-          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1, usescratch=False)
+          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1,
+          usescratch=False, **kwargs)
     exportfits(imagename=selfcal_image+".image",
                fitsimage=selfcal_image+".fits", overwrite=True,
                dropdeg=True)
@@ -186,9 +197,10 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
+          threshold=threshold,
           psfmode=psfmode, nterms=1, weighting=weighting, robust=robust,
-          multiscale=multiscale, mask=cleanboxes,
-          niter=deepniter, imsize=imsize, cell=cell, usescratch=False)
+          multiscale=multiscale, mask=cleanboxes, niter=deepniter,
+          imsize=imsize, cell=cell, usescratch=False, **kwargs)
     exportfits(imagename=selfcal_image+".image",
                fitsimage=selfcal_image+".fits", overwrite=True,
                dropdeg=True)
@@ -219,6 +231,7 @@ def apply_selfcal(rawvis, field, spwn_source, spwn_target, calnum=0):
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency',# mask=cleanboxes,
+          threshold=threshold,
             multiscale=[0,5,10,25], psfmode='hogbom',
             weighting='briggs', robust=0.5, niter=deepniter, imsize=512)
     exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
