@@ -11,19 +11,12 @@ mytb = casac.table()
 clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 
 
-def selfcal(vis, spw='6', INTERACTIVE=False,
-            field='W51 Ku', outdir_template="spw%i_selfcal_iter/",
-            statsbox='170,50,229,97', ant1list=['ea14','ea05'],
-            ant2list=['ea16','ea07'], avgchannel_wide='128',
-            avgchannel_narrow='8', cleanboxes="", refant='ea27', solint='30s',
-            niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
-            cell='0.1arcsec', weighting='uniform', robust=0.0,
-            minsnr=3, psfmode='clark', openviewer=False,
-            shallowniter=100,
-            midniter=1000,
-            deepniter=1e4,
-            minblperant=4,
-            gaintype='G'):
+def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
+            statsbox='170,50,229,97', cleanboxes="", refant='ea27',
+            solint='30s', niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
+            cell='0.1arcsec', weighting='uniform', robust=0.0, minsnr=3,
+            psfmode='clark', shallowniter=100, midniter=1000, deepniter=1e4,
+            minblperant=4, gaintype='G'):
     """
     Docstring incomplete
     """
@@ -34,11 +27,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False,
 
     split(vis=vis, outputvis="selfcal_copy_{0}".format(vis))
     vis_for_selfcal = "selfcal_copy_{0}".format(vis)
-    flagmanager(vis=vis_for_selfcal, mode='backup', versionname='original')
-
-    outdir = outdir_template % spwn
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
+    flagmanager(vis=vis_for_selfcal, mode='save', versionname='original')
 
     shallowniter = int(shallowniter)
     midniter = int(midniter)
@@ -124,7 +113,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False,
         os.system('rm -rf {0}'.format(new_vis_for_selfcal))
         os.system('rm -rf {0}.flagversions'.format(new_vis_for_selfcal))
 
-        split(vis=vis_for_selfcal, new_vis_for_selfcal,
+        split(vis=vis_for_selfcal, outputvis=new_vis_for_selfcal,
               datacolumn='corrected')
 
         vis_for_selfcal = new_vis_for_selfcal
@@ -133,14 +122,14 @@ def selfcal(vis, spw='6', INTERACTIVE=False,
         # (6) Plot corrected phase vs. amp for the antennas you picked out in (4),
         # to check that in fact the corrections have been applied as expected.
         
-        selfcal_image = 'selfcal_{0} {1}_selfcal{2}'.format(fieldstr,spwn,calnum)
+        selfcal_image = 'selfcal_{0}_{1}_selfcal{2}'.format(fieldstr,spwn,calnum)
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+selfcal_image+suffix)
         clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
               mode='mfs', psfmode=psfmode, multiscale=multiscale,
               weighting=weighting, robust=robust, niter=midniter,
               imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
-              psfmode=psfmode, usescratch=False, interactive=INTERACTIVE)
+              usescratch=False, interactive=INTERACTIVE)
         exportfits(imagename=selfcal_image+".image",
                    fitsimage=selfcal_image+".fits", overwrite=True,
                    dropdeg=True)
@@ -173,13 +162,13 @@ def selfcal(vis, spw='6', INTERACTIVE=False,
     os.system('rm -rf {0}'.format(new_vis_for_selfcal))
     os.system('rm -rf {0}.flagversions'.format(new_vis_for_selfcal))
 
-    split(vis=vis_for_selfcal, new_vis_for_selfcal,
+    split(vis=vis_for_selfcal, outputvis=new_vis_for_selfcal,
           datacolumn='corrected')
 
     vis_for_selfcal = new_vis_for_selfcal
 
 
-    selfcal_image = 'selfcal_{0} {1}_final'.format(fieldstr,spwn,calnum)
+    selfcal_image = 'selfcal_{0}_{1}_final'.format(fieldstr,spwn,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
@@ -193,7 +182,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False,
                dropdeg=True)
 
 
-    selfcal_image = 'selfcal_{0} {1}_final_multiscale'.format(fieldstr,spwn,calnum)
+    selfcal_image = 'selfcal_{0}_{1}_final_multiscale'.format(fieldstr,spwn,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
