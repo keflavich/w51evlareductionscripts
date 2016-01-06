@@ -53,99 +53,102 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
     #
     # Those are the official directions.  They are nonsense when dealing with
     # the extended emission of W51.
-    if reclean:
-        imagename="selfcal_spw%i_shallowclean_iter0" % int(spw)
+    # This first image is effectively discarded
+    imagename="selfcal_spw%i_shallowclean_iter0" % int(spw)
 
-        for suffix in clean_output_suffixes:
-            os.system("rm -rf "+imagename+suffix)
+    for suffix in clean_output_suffixes:
+        os.system("rm -rf "+imagename+suffix)
 
-        clean(vis=vis_for_selfcal, field=field, imagename=imagename, mode='mfs',
-              psfmode=psfmode, multiscale=multiscale,
-              weighting=weighting, robust=robust, niter=shallowniter,
-              imsize=imsize, cell=cell,
-              mask=cleanboxes,
-              nterms=1,
-              interactive=INTERACTIVE,
-              usescratch=True)
-        exportfits(imagename=imagename+".image", fitsimage=imagename+".fits",
-                   overwrite=True, dropdeg=True)
-        exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits",
-                   overwrite=True, dropdeg=True)
+    clean(vis=vis_for_selfcal, field=field, imagename=imagename,
+          mode='mfs', psfmode=psfmode, multiscale=multiscale,
+          weighting=weighting, robust=robust, niter=shallowniter,
+          imsize=imsize, cell=cell, mask=cleanboxes, nterms=1,
+          interactive=INTERACTIVE, usescratch=True)
+    exportfits(imagename=imagename+".image", fitsimage=imagename+".fits",
+               overwrite=True, dropdeg=True)
+    exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits",
+               overwrite=True, dropdeg=True)
 
     imrms = [imstat(imagename+".image",box=statsbox)['rms']]
 
     for calnum in xrange(niter):
-        if reclean:
 
-            first_image = 'selfcal_{0}_{1}_firstim_selfcal{2}'.format(fieldstr,
-                                                                      spw,
-                                                                      calnum)
+        first_image = 'selfcal_{0}_{1}_firstim_selfcal{2}'.format(fieldstr,
+                                                                  spw,
+                                                                  calnum)
 
-            for suffix in clean_output_suffixes:
-                os.system("rm -rf "+first_image+suffix)
+        clearcal(vis=vis_for_selfcal)
 
-            clean(vis=vis_for_selfcal,imagename=first_image,field=field,
-                  mode='mfs', psfmode=psfmode, multiscale=multiscale,
-                  weighting=weighting, robust=robust, niter=shallowniter,
-                  imsize=imsize, mask=cleanboxes, cell=cell, nterms=1,
-                  usescratch=True)
-            exportfits(imagename=first_image+".image",
-                       fitsimage=first_image+".fits", overwrite=True,
-                       dropdeg=True)
-            exportfits(imagename=first_image+".model",
-                       fitsimage=first_image+".model.fits", overwrite=True,
-                       dropdeg=True)
+        for suffix in clean_output_suffixes:
+            os.system("rm -rf "+first_image+suffix)
+
+        clean(vis=vis_for_selfcal, imagename=first_image, field=field,
+              mode='mfs', psfmode=psfmode, multiscale=multiscale,
+              weighting=weighting, robust=robust, niter=midniter,
+              imsize=imsize, mask=cleanboxes, cell=cell, nterms=1,
+              usescratch=True, interactive=INTERACTIVE)
+        exportfits(imagename=first_image+".image",
+                   fitsimage=first_image+".fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=first_image+".model",
+                   fitsimage=first_image+".model.fits", overwrite=True,
+                   dropdeg=True)
 
         caltable = 'selfcal%i_%s_spw%i.pcal' % (calnum,fieldstr,spwn)
-        if reclean:
-            os.system('rm -rf '+caltable)
-            gaincal(vis=vis_for_selfcal,
-                    field=field,
-                    caltable=caltable,
-                    spw='',
-                    # gaintype = 'T' could reduce failed fit errors by averaging pols...
-                    gaintype=gaintype, #  'G' from http://casaguides.nrao.edu/index.php?title=EVLA_Advanced_Topics_3C391
-                    solint=solint,
-                    refant=refant,
-                    calmode='p',
-                    combine='scan',
-                    minsnr=minsnr,
-                    minblperant=minblperant)
+        os.system('rm -rf '+caltable)
+        gaincal(vis=vis_for_selfcal,
+                field=field,
+                caltable=caltable,
+                spw='',
+                # gaintype = 'T' could reduce failed fit errors by averaging pols...
+                gaintype=gaintype, #  'G' from http://casaguides.nrao.edu/index.php?title=EVLA_Advanced_Topics_3C391
+                solint=solint,
+                refant=refant,
+                calmode='p',
+                combine='scan',
+                minsnr=minsnr,
+                minblperant=minblperant)
 
         # Watch out for failed solutions noted in the terminal during this
         # solution. If you see a large fraction (really more than 1 or 2) of
         # your antennas failing to converge in many time intervals then you
         # may need to lengthen the solution interval.
 
-        if reclean:
-            applycal(vis=vis_for_selfcal,
-                     gaintable=caltable,
-                     interp='linear',
-                     flagbackup=False) # no need when using flagmanager
-            flagmanager(vis=vis_for_selfcal, mode='restore', versionname='original')
+        applycal(vis=vis_for_selfcal,
+                 gaintable=caltable,
+                 interp='linear',
+                 flagbackup=False) # no need when using flagmanager
+        flagmanager(vis=vis_for_selfcal, mode='restore', versionname='original')
+
+        new_vis_for_selfcal = "selfcal{1}_copy_{0}".format(vis, calnum)
+        os.system('rm -rf {0}'.format(new_vis_for_selfcal))
+        os.system('rm -rf {0}.flagversions'.format(new_vis_for_selfcal))
+
+        split(vis=vis_for_selfcal, new_vis_for_selfcal,
+              datacolumn='corrected')
+
+        vis_for_selfcal = new_vis_for_selfcal
+
 
         # (6) Plot corrected phase vs. amp for the antennas you picked out in (4),
         # to check that in fact the corrections have been applied as expected.
         
-        if reclean:
-            selfcal_image = 'selfcal_{0} {1}_selfcal{2}'.format(fieldstr,spwn,calnum)
-            for suffix in clean_output_suffixes:
-                os.system("rm -rf "+selfcal_image+suffix)
-            clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
-                  mode='mfs', psfmode=psfmode, multiscale=multiscale,
-                  weighting=weighting, robust=robust, niter=midniter,
-                  imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
-                  psfmode=psfmode,
-                  usescratch=True)
-            exportfits(imagename=selfcal_image+".image",
-                       fitsimage=selfcal_image+".fits", overwrite=True,
-                       dropdeg=True)
-            exportfits(imagename=selfcal_image+".model",
-                       fitsimage=selfcal_image+".model.fits", overwrite=True,
-                       dropdeg=True)
+        selfcal_image = 'selfcal_{0} {1}_selfcal{2}'.format(fieldstr,spwn,calnum)
+        for suffix in clean_output_suffixes:
+            os.system("rm -rf "+selfcal_image+suffix)
+        clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
+              mode='mfs', psfmode=psfmode, multiscale=multiscale,
+              weighting=weighting, robust=robust, niter=midniter,
+              imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
+              psfmode=psfmode, usescratch=False, interactive=INTERACTIVE)
+        exportfits(imagename=selfcal_image+".image",
+                   fitsimage=selfcal_image+".fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=selfcal_image+".model",
+                   fitsimage=selfcal_image+".model.fits", overwrite=True,
+                   dropdeg=True)
 
         imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
-
 
         print "FINISHED ITERATION %i" % calnum
 
@@ -166,12 +169,22 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
              flagbackup=False)
     flagmanager(vis=vis_for_selfcal, mode='restore', versionname='original')
 
+    new_vis_for_selfcal = "selfcal{1}{2}_copy_{0}".format(vis, "final", calnum)
+    os.system('rm -rf {0}'.format(new_vis_for_selfcal))
+    os.system('rm -rf {0}.flagversions'.format(new_vis_for_selfcal))
+
+    split(vis=vis_for_selfcal, new_vis_for_selfcal,
+          datacolumn='corrected')
+
+    vis_for_selfcal = new_vis_for_selfcal
+
+
     selfcal_image = 'selfcal_{0} {1}_final'.format(fieldstr,spwn,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
           mask=cleanboxes, weighting=weighting, robust=robust, niter=deepniter,
-          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1, usescratch=True)
+          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1, usescratch=False)
     exportfits(imagename=selfcal_image+".image",
                fitsimage=selfcal_image+".fits", overwrite=True,
                dropdeg=True)
@@ -186,7 +199,7 @@ def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
           psfmode=psfmode, nterms=1, weighting=weighting, robust=robust,
           multiscale=multiscale, mask=cleanboxes,
-          niter=deepniter, imsize=imsize, cell=cell, usescratch=True)
+          niter=deepniter, imsize=imsize, cell=cell, usescratch=False)
     exportfits(imagename=selfcal_image+".image",
                fitsimage=selfcal_image+".fits", overwrite=True,
                dropdeg=True)
