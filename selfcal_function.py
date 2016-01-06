@@ -11,7 +11,7 @@ mytb = casac.table()
 clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 
 
-def selfcal(vis, spw='6', doplots=True, INTERACTIVE=False, reclean=True,
+def selfcal(vis, spw='6', INTERACTIVE=False,
             field='W51 Ku', outdir_template="spw%i_selfcal_iter/",
             statsbox='170,50,229,97', ant1list=['ea14','ea05'],
             ant2list=['ea16','ea07'], avgchannel_wide='128',
