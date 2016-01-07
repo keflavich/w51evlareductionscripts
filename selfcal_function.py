@@ -16,7 +16,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
             solint='30s', niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
             cell='0.1arcsec', weighting='uniform', robust=0.0, minsnr=3,
             psfmode='clark', shallowniter=100, midniter=1000, deepniter=1e4,
-            threshold='0.0mJy',
+            threshold='0.0mJy', pointclean=False,
             minblperant=4, gaintype='G', **kwargs):
     """
     Docstring incomplete
@@ -57,9 +57,18 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
           weighting=weighting, robust=robust, niter=shallowniter,
           imsize=imsize, cell=cell, mask=cleanboxes, nterms=1,
           interactive=INTERACTIVE, usescratch=True, **kwargs)
+    if pointclean:
+        clean(vis=vis_for_selfcal, field=field, imagename=imagename,
+              threshold=threshold,
+              mode='mfs', psfmode=psfmode,
+              weighting=weighting, robust=robust, niter=shallowniter,
+              imsize=imsize, cell=cell, mask=cleanboxes, nterms=1,
+              interactive=INTERACTIVE, usescratch=True, **kwargs)
     exportfits(imagename=imagename+".image", fitsimage=imagename+".fits",
                overwrite=True, dropdeg=True)
     exportfits(imagename=imagename+".model", fitsimage=imagename+".model.fits",
+               overwrite=True, dropdeg=True)
+    exportfits(imagename=imagename+".residual", fitsimage=imagename+".residual.fits",
                overwrite=True, dropdeg=True)
 
     imrms = [imstat(imagename+".image",box=statsbox)['rms']]
@@ -81,11 +90,21 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
               weighting=weighting, robust=robust, niter=midniter,
               imsize=imsize, mask=cleanboxes, cell=cell, nterms=1,
               usescratch=True, interactive=INTERACTIVE, **kwargs)
+        if pointclean:
+            clean(vis=vis_for_selfcal, imagename=first_image, field=field,
+                  threshold=threshold,
+                  mode='mfs', psfmode=psfmode,
+                  weighting=weighting, robust=robust, niter=midniter,
+                  imsize=imsize, mask=cleanboxes, cell=cell, nterms=1,
+                  usescratch=True, interactive=INTERACTIVE, **kwargs)
         exportfits(imagename=first_image+".image",
                    fitsimage=first_image+".fits", overwrite=True,
                    dropdeg=True)
         exportfits(imagename=first_image+".model",
                    fitsimage=first_image+".model.fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=first_image+".residual",
+                   fitsimage=first_image+".residual.fits", overwrite=True,
                    dropdeg=True)
 
         caltable = 'selfcal%i_%s_spw%i.pcal' % (calnum,fieldstr,spwn)
@@ -138,11 +157,21 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
               weighting=weighting, robust=robust, niter=midniter,
               imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
               usescratch=False, interactive=INTERACTIVE, **kwargs)
+        if pointclean:
+            clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
+                  threshold=threshold,
+                  mode='mfs', psfmode=psfmode,
+                  weighting=weighting, robust=robust, niter=midniter,
+                  imsize=imsize, cell=cell, nterms=1, mask=cleanboxes,
+                  usescratch=False, interactive=INTERACTIVE, **kwargs)
         exportfits(imagename=selfcal_image+".image",
                    fitsimage=selfcal_image+".fits", overwrite=True,
                    dropdeg=True)
         exportfits(imagename=selfcal_image+".model",
                    fitsimage=selfcal_image+".model.fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=selfcal_image+".residual",
+                   fitsimage=selfcal_image+".residual.fits", overwrite=True,
                    dropdeg=True)
 
         imrms.append(imstat(selfcal_image+".image",box=statsbox)['rms'])
@@ -154,6 +183,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # final phase + gain cal:
     # http://casaguides.nrao.edu/index.php?title=Calibrating_a_VLA_5_GHz_continuum_survey#One_Last_Iteration:_Amplitude_.26_Phase_Self_Calibration
     aptable = 'selfcal_ap_%s_spw%i.gcal' % (field.replace(" ",""),spwn)
+    os.system('rm -rf '+aptable)
     gaincal(vis=vis_for_selfcal, field=field, caltable=aptable,
             gaintable=caltable, spw='', solint='inf', refant=refant,
             calmode='ap', combine='', minblperant=minblperant,
@@ -161,7 +191,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
 
 
     applycal(vis=vis_for_selfcal,
-             gaintable=[aptable,caltable],
+             gaintable=[aptable],
              interp='linear',
              flagbackup=False)
     flagmanager(vis=vis_for_selfcal, mode='restore', versionname='original')
@@ -177,20 +207,26 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     vis_for_selfcal = new_vis_for_selfcal
 
 
-    selfcal_image = 'selfcal_{0}_{1}_final'.format(fieldstr,spwn,calnum)
-    for suffix in clean_output_suffixes:
-        os.system("rm -rf "+selfcal_image+suffix)
-    clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
-          threshold=threshold,
-          mask=cleanboxes, weighting=weighting, robust=robust, niter=deepniter,
-          psfmode=psfmode, imsize=imsize, cell=cell, nterms=1,
-          usescratch=False, **kwargs)
-    exportfits(imagename=selfcal_image+".image",
-               fitsimage=selfcal_image+".fits", overwrite=True,
-               dropdeg=True)
-    exportfits(imagename=selfcal_image+".model",
-               fitsimage=selfcal_image+".model.fits", overwrite=True,
-               dropdeg=True)
+    # pointsource cleaning only (this doesn't work very well for W51)
+    # don't bother doing it if multiscale is empty
+    if multiscale:
+        selfcal_image = 'selfcal_{0}_{1}_final'.format(fieldstr,spwn,calnum)
+        for suffix in clean_output_suffixes:
+            os.system("rm -rf "+selfcal_image+suffix)
+        clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
+              threshold=threshold,
+              mask=cleanboxes, weighting=weighting, robust=robust, niter=deepniter,
+              psfmode=psfmode, imsize=imsize, cell=cell, nterms=1,
+              usescratch=False, **kwargs)
+        exportfits(imagename=selfcal_image+".image",
+                   fitsimage=selfcal_image+".fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=selfcal_image+".model",
+                   fitsimage=selfcal_image+".model.fits", overwrite=True,
+                   dropdeg=True)
+        exportfits(imagename=selfcal_image+".residual",
+                   fitsimage=selfcal_image+".residual.fits", overwrite=True,
+                   dropdeg=True)
 
 
     selfcal_image = 'selfcal_{0}_{1}_final_multiscale'.format(fieldstr,spwn,calnum)
@@ -201,11 +237,20 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
           psfmode=psfmode, nterms=1, weighting=weighting, robust=robust,
           multiscale=multiscale, mask=cleanboxes, niter=deepniter,
           imsize=imsize, cell=cell, usescratch=False, **kwargs)
+    if pointclean:
+        clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
+              threshold=threshold,
+              psfmode=psfmode, nterms=1, weighting=weighting, robust=robust,
+              mask=cleanboxes, niter=deepniter,
+              imsize=imsize, cell=cell, usescratch=False, **kwargs)
     exportfits(imagename=selfcal_image+".image",
                fitsimage=selfcal_image+".fits", overwrite=True,
                dropdeg=True)
     exportfits(imagename=selfcal_image+".model",
                fitsimage=selfcal_image+".model.fits", overwrite=True,
+               dropdeg=True)
+    exportfits(imagename=selfcal_image+".residual",
+               fitsimage=selfcal_image+".residual.fits", overwrite=True,
                dropdeg=True)
 
     return imrms
