@@ -19,18 +19,19 @@ execfile('selfcal_function.py')
 clearcal(vis='W51_C_AC_continuum_spw4.ms')
 flagmanager(vis='W51_C_AC_continuum_spw4.ms', mode='restore',
             versionname='main')
-imrms = selfcal(vis='W51_C_AC_continuum_spw4.ms', spw='0', field='W51 Ku',
+imrms = selfcal(vis='W51_C_AC_continuum_spw4.ms', spw='0',
+                spwname='4', field='W51 Ku',
                 solint='60s', multiscale=[0,3,9,27,81], imsize=2048,
-                cell='0.075arcsec', niter=3, shallowniter=1000,
+                cell='0.075arcsec', niter=4, shallowniter=1000,
                 pointclean=True,
                 phasecenter="J2000 19h23m42.759 14d30m30.97",
                 weighting='uniform',
                 psfmode='clark',
                 refant='',
                 threshold='1.0mJy',
-                smallscalebias=1.0,
+                smallscalebias=1.0, # is ignored by MFS clean
                 minsnr=6,
-                midniter=int(5000), deepniter=int(1e4))
+                midniter=int(1e4), deepniter=int(1e4))
 
 for ii,rms in enumerate(imrms):
     print("SPW{2} Iteration {0}: RMS={1:0.3e}".format(ii,rms[0],4))

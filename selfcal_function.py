@@ -11,7 +11,7 @@ mytb = casac.table()
 clean_output_suffixes = [".image", ".model", ".flux", ".psf", ".residual",]
 
 
-def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
+def selfcal(vis, spw='6', spwname=None, INTERACTIVE=False, field='W51 Ku',
             statsbox='170,50,229,97', cleanboxes="", refant='ea27',
             solint='30s', niter=2, multiscale=[0,3,6,12,24,48,96], imsize=512,
             cell='0.1arcsec', weighting='uniform', robust=0.0, minsnr=3,
@@ -25,6 +25,8 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # Jan 2016: the fact that I have to make these declarations indicates that
     # this code never actually worked.
     spwn = int(spw)
+    if spwname is None:
+        spwname = str(spw)
 
     vis_for_selfcal = "selfcal_copy_{0}".format(vis)
     os.system('rm -rf {0}'.format(vis_for_selfcal))
@@ -46,7 +48,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # Those are the official directions.  They are nonsense when dealing with
     # the extended emission of W51.
     # This first image is effectively discarded
-    imagename="selfcal_{1}_spw{0}_shallowclean_iter0".format(spw, fieldstr)
+    imagename="selfcal_{1}_spw{0}_shallowclean_iter0".format(spwname, fieldstr)
 
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+imagename+suffix)
@@ -76,7 +78,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     for calnum in xrange(niter):
 
         first_image = 'selfcal_{0}_{1}_firstim_selfcal{2}'.format(fieldstr,
-                                                                  spw,
+                                                                  spwname,
                                                                   calnum)
 
         clearcal(vis=vis_for_selfcal)
@@ -107,7 +109,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
                    fitsimage=first_image+".residual.fits", overwrite=True,
                    dropdeg=True)
 
-        caltable = 'selfcal%i_%s_spw%i.pcal' % (calnum,fieldstr,spwn)
+        caltable = 'selfcal{0}_{1}_spw{2}.pcal'.format(calnum,fieldstr,spwname)
         os.system('rm -rf '+caltable)
         gaincal(vis=vis_for_selfcal,
                 field=field,
@@ -148,7 +150,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
         # (6) Plot corrected phase vs. amp for the antennas you picked out in (4),
         # to check that in fact the corrections have been applied as expected.
         
-        selfcal_image = 'selfcal_{0}_{1}_selfcal{2}'.format(fieldstr,spwn,calnum)
+        selfcal_image = 'selfcal_{0}_{1}_selfcal{2}'.format(fieldstr,spwname,calnum)
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+selfcal_image+suffix)
         clean(vis=vis_for_selfcal, imagename=selfcal_image, field=field,
@@ -182,7 +184,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
 
     # final phase + gain cal:
     # http://casaguides.nrao.edu/index.php?title=Calibrating_a_VLA_5_GHz_continuum_survey#One_Last_Iteration:_Amplitude_.26_Phase_Self_Calibration
-    aptable = 'selfcal_ap_%s_spw%i.gcal' % (field.replace(" ",""),spwn)
+    aptable = 'selfcal_ap_{0}_spw{1}.gcal'.format(field.replace(" ",""),spwname)
     os.system('rm -rf '+aptable)
     gaincal(vis=vis_for_selfcal, field=field, caltable=aptable,
             gaintable=caltable, spw='', solint='inf', refant=refant,
@@ -210,7 +212,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
     # pointsource cleaning only (this doesn't work very well for W51)
     # don't bother doing it if multiscale is empty
     if multiscale:
-        selfcal_image = 'selfcal_{0}_{1}_final'.format(fieldstr,spwn,calnum)
+        selfcal_image = 'selfcal_{0}_{1}_final'.format(fieldstr,spwname,calnum)
         for suffix in clean_output_suffixes:
             os.system("rm -rf "+selfcal_image+suffix)
         clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
@@ -229,7 +231,7 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
                    dropdeg=True)
 
 
-    selfcal_image = 'selfcal_{0}_{1}_final_multiscale'.format(fieldstr,spwn,calnum)
+    selfcal_image = 'selfcal_{0}_{1}_final_multiscale'.format(fieldstr,spwname,calnum)
     for suffix in clean_output_suffixes:
         os.system("rm -rf "+selfcal_image+suffix)
     clean(vis=vis_for_selfcal,imagename=selfcal_image,field=field, mode='mfs',
@@ -254,29 +256,3 @@ def selfcal(vis, spw='6', INTERACTIVE=False, field='W51 Ku',
                dropdeg=True)
 
     return imrms
-
-
-def apply_selfcal(rawvis, field, spwn_source, spwn_target, calnum=0):
-
-    noavg_data = '%s_spw%i_split.ms' % (field.replace(" ",""),spwn_target)
-    aptable = 'selfcal_ap_%s_spw%i.gcal' % (field.replace(" ",""),spwn_source)
-    caltable = 'selfcal%i_%s_spw%i.gcal' % (calnum,field.replace(" ",""),spwn_source)
-
-    os.system('rm -rf '+noavg_data)
-    split(vis=vis,
-          outputvis=noavg_data,
-          datacolumn='corrected', # was 'data'...
-          spw=str(spwn_target))
-    applycal(vis=noavg_data,
-             gaintable=[aptable,caltable],
-             interp='linear',
-             flagbackup=True) # was False when flagmanager was used
-
-    selfcal_image = 'spw%i_ku_d_selfcal%i_final_cube' % (spwn_target,calnum)
-    for suffix in clean_output_suffixes:
-        os.system("rm -rf "+selfcal_image+suffix)
-    clean(vis=noavg_data,imagename=selfcal_image,field=field, mode='frequency',# mask=cleanboxes,
-          threshold=threshold,
-            multiscale=[0,5,10,25], psfmode='hogbom',
-            weighting='briggs', robust=0.5, niter=deepniter, imsize=512)
-    exportfits(imagename=selfcal_image+".image", fitsimage=selfcal_image+".fits", overwrite=True)
