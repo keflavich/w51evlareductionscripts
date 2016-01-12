@@ -1,7 +1,9 @@
 import os
 import numpy as np
 
-low,high = '8,9,10,11,12,13,14,15','0,1,2,3,4,5,6,7'
+# January 11, 2016: spw 8 and spw 0 are really bad, they don't reproduce the
+# same structures as other SPWs and probably result in some of the bad clean
+low,high = '9,10,11,12,13,14,15','1,2,3,4,5,6,7'
 both = ",".join([low,high])
 niter = {'dirty':0, 'clean':int(1e5), 'veryclean':int(1e6)}
 vis = ['../W51_C_C/13A-064.sb21341436.eb23334759.56447.48227415509.ms',
@@ -9,8 +11,9 @@ vis = ['../W51_C_C/13A-064.sb21341436.eb23334759.56447.48227415509.ms',
 
 vis = ['W51_Cband_Aarray_continuum.ms','W51_Cband_Carray_continuum.ms']
 
-if not os.path.exists('W51_C_AC_continuum.ms'):
-    concat(vis=vis, concatvis='W51_C_AC_continuum.ms')
+concatvis = 'W51_C_AC_continuum.ms'
+if not os.path.exists(concatvis):
+    concat(vis=vis, concatvis=concatvis)
 
 execfile('selfcal_function.py')
 
